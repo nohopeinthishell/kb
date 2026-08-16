@@ -26,9 +26,7 @@ React + TypeScript, игровой зал отрисовывается чере�
 | Файл | О чём |
 |---|---|
 | [docs/game-plan.md](docs/game-plan.md) | Что за игра, что видит игрок, как проходит партия |
-| [docs/backlog.md](docs/backlog.md) | Задачи, оценки, приоритеты, распределение по спринтам |
 | [docs/architecture.md](docs/architecture.md) | Слои, границы модулей, ограничения SSR |
-| [docs/decisions.md](docs/decisions.md) | Журнал принятых решений и их причины |
 | [AGENTS.md](AGENTS.md) | Инструкции для AI-помощников |
 
 Актуальные задачи — на доске в GitHub Projects.
@@ -127,7 +125,7 @@ docs/               # документация проекта
 `packages/client`.
 
 Это **витрина для ревью, а не прод**: превью собирается статикой, без серверного рендера.
-Продакшен живёт в Yandex Cloud, там же меряется Lighthouse. Почему так — `docs/decisions.md`.
+Продакшен живёт в Yandex Cloud, там же меряется Lighthouse.
 
 ## Production окружение в докере
 Перед первым запуском выполните `node init.js`
