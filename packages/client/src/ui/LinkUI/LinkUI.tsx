@@ -1,21 +1,7 @@
-import { Link, LinkProps } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-type LinkUIProps = Omit<LinkProps, 'to'> & {
-  to?: LinkProps['to']
-}
-
-const LinkUI = ({ to = '/', children, ...props }: LinkUIProps) => {
-  return (
-    <LinkComponent to={to} {...props}>
-      {children}
-    </LinkComponent>
-  )
-}
-
-export default LinkUI
-
-const LinkComponent = styled(Link)`
+const LinkUI = styled(Link)`
   min-height: 56px;
   padding: 0 28px;
   display: inline-flex;
@@ -47,3 +33,5 @@ const LinkComponent = styled(Link)`
     outline-offset: 4px;
   }
 `
+
+export default LinkUI
