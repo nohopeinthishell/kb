@@ -40,3 +40,18 @@ export type ActionError =
   | 'NOT_ENOUGH_GOLD'
   | 'HELPER_ALREADY_ACTIVE'
   | 'PROVISIONS_ALREADY_ACTIVE'
+
+export type SeatingResult = {
+  seatedGuestCount: number
+  queueSize: number
+}
+
+export type WeekCalculation = {
+  guestCount: number
+  seatedGuestCount: number
+  queueSize: number
+  servedGuestCount: number
+  unservedGuestCount: number
+  income: number
+  expenses: number
+}
