@@ -36,7 +36,7 @@ export type GameAction =
 
 export type ActionError =
   | 'TABLE_NOT_FOUND'
-  | 'TABLE_NOT_BROKEN'
+  | 'TABLE_DOES_NOT_NEED_REPAIR'
   | 'NOT_ENOUGH_GOLD'
   | 'HELPER_ALREADY_ACTIVE'
   | 'PROVISIONS_ALREADY_ACTIVE'
@@ -44,6 +44,7 @@ export type ActionError =
 export type SeatingResult = {
   seatedGuestCount: number
   queueSize: number
+  workingTables: TableState[]
 }
 
 export type WeekCalculation = {
@@ -54,4 +55,5 @@ export type WeekCalculation = {
   unservedGuestCount: number
   income: number
   expenses: number
+  workingTables: TableState[]
 }

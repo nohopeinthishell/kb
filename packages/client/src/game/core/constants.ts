@@ -31,6 +31,6 @@ export const HELPER_SERVICE_CAPACITY = 16
 
 export const WEEKLY_EXPENSES = 290
 
-export const feeForQueue = -10
+export const QUEUE_REPUTATION_PENALTY = 5
 
-export const feeForBrokenTable = -10
+export const BROKEN_TABLE_REPUTATION_PENALTY = 10

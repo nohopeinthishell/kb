@@ -136,8 +136,13 @@ game/
 // переход недели: событие, гости, доход, репутация, износ
 function tick(state: GameState, choice: ChoiceId | null): GameState
 
-// действие игрока внутри недели: ремонт, помощник, провизия
-function applyAction(state: GameState, action: ActionId): GameState
+type GameAction =
+  | { type: 'repairTable'; tableId: number }
+  | { type: 'hireHelper' }
+  | { type: 'buyProvision' }
+
+// действие игрока внутри недели: ремонт выбранного стола, помощник, провизия
+function applyAction(state: GameState, action: GameAction): GameState
 
 // прогноз для кнопки «Следующая неделя»: «доход ~380, расходы ~290»
 function forecast(state: GameState): { income: number; expenses: number }
@@ -151,10 +156,14 @@ function forecast(state: GameState): { income: number; expenses: number }
 на кнопке считается по тем же формулам, что и `tick`. Если посчитать его в компоненте,
 формула окажется в двух местах и разъедется на первой же правке баланса.
 
+Ремонт — целевое действие: UI передаёт в `applyAction` идентификатор выбранного стола.
+`core` проверяет, что стол существует, он изношен или сломан и денег хватает, после чего
+переводит его в исправное состояние. Правило доступности ремонта не дублируется в React.
+
 Аналогия для тех, кто пришёл с бэкенда: `core` — это доменный слой. Он не знает,
 кто его вызвал: HTTP, очередь или тест.
 
-**`render/` — отрисовка.** Тоже одна функция:
+**`render/` — отрисовка.** Основная функция:
 
 ```ts
 function render(ctx: CanvasRenderingContext2D, state: GameState, theme: Theme): void
@@ -162,6 +171,11 @@ function render(ctx: CanvasRenderingContext2D, state: GameState, theme: Theme): 
 
 Получает состояние и рисует его на холсте. Правил игры не знает — не решает, сколько
 гостей придёт, только рисует тех, кто уже есть в состоянии.
+
+Для клика по столу `render/` также содержит hit-test: переводит координаты указателя
+в `tableId`, используя ту же геометрию, по которой рисуются столы. `ui/` управляет режимом
+выбора и передаёт найденный `tableId` в `applyAction`; решение, можно ли ремонтировать
+этот стол, остаётся в `core`.
 
 Постоянного игрового цикла нет: перерисовываем, когда изменилось состояние.
 `requestAnimationFrame` включается только на время анимации перехода недели.

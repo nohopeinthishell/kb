@@ -23,7 +23,7 @@ export const applyAction = (
       }
 
       if (tableToRepair.condition === 'new') {
-        return { ...state, lastActionError: 'TABLE_NOT_BROKEN' }
+        return { ...state, lastActionError: 'TABLE_DOES_NOT_NEED_REPAIR' }
       }
 
       if (state.money < GOLD_TO_FIX_TABLE) {
