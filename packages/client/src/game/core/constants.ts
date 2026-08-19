@@ -1,0 +1,7 @@
+export const GOLD_TO_FIX_TABLE = 1000
+
+export const GOLD_TO_HIRE_HELPER = 1000
+
+export const GOLD_TO_BUY_PROVISION = 1000
+
+export const PROVISION_DURATION_WEEKS = 3
