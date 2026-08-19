@@ -57,3 +57,8 @@ export type WeekCalculation = {
   expenses: number
   workingTables: TableState[]
 }
+
+export type RandomResult = {
+  value: number
+  nextSeed: number
+}

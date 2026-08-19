@@ -34,3 +34,5 @@ export const WEEKLY_EXPENSES = 290
 export const QUEUE_REPUTATION_PENALTY = 5
 
 export const BROKEN_TABLE_REPUTATION_PENALTY = 10
+
+export const CHANCE_TO_BREAK_TABLE = 0.25
