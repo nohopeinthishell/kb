@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import { Provider } from 'react-redux'
-import { ServerStyleSheet } from 'styled-components'
+import { ServerStyleSheet, ThemeProvider } from 'styled-components'
 import { HelmetProvider, HelmetServerState } from 'react-helmet-async'
 import { Request as ExpressRequest } from 'express'
 import {
@@ -19,7 +19,8 @@ import {
 } from './entry-server.utils'
 import { reducer } from './store'
 import { routes } from './routes'
-import './index.css'
+import { GlobalStyle, theme } from './theme'
+import './assets/css/index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
 
 export const render = async (req: ExpressRequest) => {
@@ -67,9 +68,12 @@ export const render = async (req: ExpressRequest) => {
     const html = ReactDOM.renderToString(
       sheet.collectStyles(
         <HelmetProvider context={helmetContext}>
-          <Provider store={store}>
-            <StaticRouterProvider router={router} context={context} />
-          </Provider>
+          <ThemeProvider theme={theme}>
+            <GlobalStyle />
+            <Provider store={store}>
+              <StaticRouterProvider router={router} context={context} />
+            </Provider>
+          </ThemeProvider>
         </HelmetProvider>
       )
     )
