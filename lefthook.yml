@@ -1,3 +1,8 @@
+prepare-commit-msg:
+  commands:
+    task-prefix:
+      run: node scripts/prepare-commit-msg.js {1} {2}
+
 pre-commit:
   parallel: true
   commands:

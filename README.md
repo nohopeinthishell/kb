@@ -27,6 +27,7 @@ React + TypeScript, игровой зал отрисовывается чере�
 |---|---|
 | [docs/game-plan.md](docs/game-plan.md) | Что за игра, что видит игрок, как проходит партия |
 | [docs/architecture.md](docs/architecture.md) | Слои, границы модулей, ограничения SSR |
+| [docs/contributing.md](docs/contributing.md) | Правила разработки, git, ревью и спринта |
 | [AGENTS.md](AGENTS.md) | Инструкции для AI-помощников |
 
 Актуальные задачи — на доске в GitHub Projects.
@@ -56,6 +57,8 @@ docs/               # документация проекта
 - CI обязан быть зелёным: линтер, тайпчек, тесты
 - Задача закрыта после мержа, а не после «локально работает»
 - Заморозка фич — середина седьмого спринта, дальше только багфиксы
+
+Подробно — в [docs/contributing.md](docs/contributing.md): ветки, PR, ревью.
 
 Перед первым PR прочитайте [docs/architecture.md](docs/architecture.md) —
 там границы слоёв и ограничения SSR, которые проверяются на ревью.
