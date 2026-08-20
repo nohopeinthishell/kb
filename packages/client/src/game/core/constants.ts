@@ -35,4 +35,6 @@ export const QUEUE_REPUTATION_PENALTY = 5
 
 export const BROKEN_TABLE_REPUTATION_PENALTY = 10
 
-export const CHANCE_TO_BREAK_TABLE = 0.25
+export const TABLE_DEGRADATION_CHANCE = 0.25
+
+export const RANDOM_GUEST_OFFSETS = [-2, -1, 0, 1, 2]

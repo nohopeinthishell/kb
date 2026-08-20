@@ -1,29 +1,27 @@
 import {
   BASE_SERVICE_CAPACITY,
-  BROKEN_TABLE_REPUTATION_PENALTY,
   GOLD_PER_GUEST,
   GUESTS_BY_REPUTATION,
   HELPER_SERVICE_CAPACITY,
-  MOOD_REPUTATION_DELTA,
   PROVISION_MULTIPLIER,
-  QUEUE_REPUTATION_PENALTY,
   TABLE_CAPACITY,
   WEEKLY_EXPENSES,
 } from './constants'
-import {
-  GameState,
-  GuestState,
-  SeatingResult,
-  TableState,
-  WeekCalculation,
-} from './types'
+import { GameState, SeatingResult, TableState, WeekCalculation } from './types'
 
 export const forecast = (state: GameState): WeekCalculation => {
+  const expectedGuestCount = getGuestsByReputation(state.reputation)
+
+  return calculateWeek(state, expectedGuestCount)
+}
+
+export const calculateWeek = (
+  state: GameState,
+  guestCount: number
+): WeekCalculation => {
   const serviceCapacity = state.tavern.helperActive
     ? HELPER_SERVICE_CAPACITY
     : BASE_SERVICE_CAPACITY
-
-  const guestCount = getGuestsByReputation(state.reputation)
 
   const { queueSize, seatedGuestCount, workingTables } = calculateSeating(
     guestCount,
@@ -56,7 +54,7 @@ export const forecast = (state: GameState): WeekCalculation => {
   }
 }
 
-const getGuestsByReputation = (reputation: number): number => {
+export const getGuestsByReputation = (reputation: number): number => {
   const normalizedReputation = Math.max(0, Math.min(100, reputation))
 
   const range = GUESTS_BY_REPUTATION.find(
@@ -79,52 +77,4 @@ const calculateSeating = (
   const queueSize = Math.max(0, guests - capacity)
 
   return { queueSize, seatedGuestCount, workingTables }
-}
-
-export const createGuests = (
-  seatedGuestCount: number,
-  servedGuestCount: number,
-  workingTables: TableState[]
-): GuestState[] => {
-  const guests: GuestState[] = []
-
-  for (let count = 0; count < seatedGuestCount; count++) {
-    const tableIndex = Math.floor(count / TABLE_CAPACITY)
-
-    const table = workingTables[tableIndex]
-
-    const isTableWorn = table?.condition === 'worn'
-
-    const mood =
-      count >= servedGuestCount ? 'unhappy' : isTableWorn ? 'neutral' : 'happy'
-
-    if (table) {
-      guests.push({
-        id: count,
-        tableId: table.id,
-        mood,
-      })
-    }
-  }
-
-  return guests
-}
-
-export const calculateReputationDelta = (
-  guests: GuestState[],
-  queueSize: number,
-  brokenTables: number
-): number => {
-  const totalMoodDelta = guests.reduce((acc, guest) => {
-    return acc + MOOD_REPUTATION_DELTA[guest.mood]
-  }, 0)
-
-  const averageMoodDelta =
-    guests.length === 0 ? 0 : totalMoodDelta / guests.length
-
-  return Math.round(
-    averageMoodDelta -
-      QUEUE_REPUTATION_PENALTY * queueSize -
-      BROKEN_TABLE_REPUTATION_PENALTY * brokenTables
-  )
 }

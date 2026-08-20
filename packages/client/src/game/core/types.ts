@@ -16,6 +16,8 @@ export type GameState = {
   }
 
   lastActionError: ActionError | null
+
+  currentEventId: string | null
 }
 
 export type GuestState = {
@@ -60,5 +62,15 @@ export type WeekCalculation = {
 
 export type RandomResult = {
   value: number
+  nextSeed: number
+}
+
+export type RandomGuestsResult = {
+  guestCount: number
+  nextSeed: number
+}
+
+export type TableDegradationResult = {
+  tables: TableState[]
   nextSeed: number
 }

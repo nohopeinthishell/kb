@@ -11,14 +11,25 @@ export const initialGameState: GameState = {
   tavern: {
     tables: [
       { id: 1, condition: 'new' },
-      { id: 2, condition: 'new' },
-      { id: 3, condition: 'new' },
+      { id: 2, condition: 'broken' },
+      { id: 3, condition: 'worn' },
       { id: 4, condition: 'new' },
     ],
-    guests: [],
+    guests: [
+      { id: 0, tableId: 1, mood: 'happy' },
+      { id: 1, tableId: 1, mood: 'happy' },
+      { id: 2, tableId: 1, mood: 'neutral' },
+      { id: 3, tableId: 1, mood: 'unhappy' },
+      { id: 4, tableId: 3, mood: 'neutral' },
+      { id: 5, tableId: 3, mood: 'neutral' },
+      { id: 6, tableId: 4, mood: 'happy' },
+      { id: 7, tableId: 4, mood: 'happy' },
+    ],
     queueSize: 0,
     helperActive: false,
   },
 
   lastActionError: null,
+
+  currentEventId: null,
 }

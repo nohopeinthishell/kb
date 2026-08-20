@@ -1,8 +1,17 @@
-import { calculateReputationDelta, createGuests, forecast } from './forecast'
+import {
+  calculateRandomGuests,
+  calculateReputationDelta,
+  createGuests,
+  degradeTable,
+} from './actions'
+import { calculateWeek, getGuestsByReputation } from './forecast'
 import { GameState } from './types'
 
 export const tick = (state: GameState): GameState => {
   if (state.status !== 'playing') return state
+
+  const expectedGuestCount = getGuestsByReputation(state.reputation)
+  const randomGuests = calculateRandomGuests(state.seed, expectedGuestCount)
 
   const {
     seatedGuestCount,
@@ -11,11 +20,17 @@ export const tick = (state: GameState): GameState => {
     income,
     expenses,
     workingTables,
-  } = forecast(state)
+  } = calculateWeek(state, randomGuests.guestCount)
 
   const guests = createGuests(seatedGuestCount, servedGuestCount, workingTables)
 
-  const brokenTables = state.tavern.tables.length - workingTables.length
+  const tableDegradation = degradeTable(
+    randomGuests.nextSeed,
+    state.tavern.tables
+  )
+  const brokenTables = tableDegradation.tables.filter(
+    table => table.condition === 'broken'
+  ).length
 
   const reputationDelta = calculateReputationDelta(
     guests,
@@ -34,11 +49,13 @@ export const tick = (state: GameState): GameState => {
     ...state,
     money: state.money + income - expenses,
     reputation,
+    seed: tableDegradation.nextSeed,
     week: isFinalWeek ? 6 : state.week + 1,
     provisionWeeks: state.provisionWeeks > 0 ? state.provisionWeeks - 1 : 0,
     lastActionError: null,
     tavern: {
       ...state.tavern,
+      tables: tableDegradation.tables,
       guests,
       queueSize,
       helperActive: false,
