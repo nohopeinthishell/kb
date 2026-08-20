@@ -1,0 +1,15 @@
+@import url('./normalize.css');
+@import url('./fonts.css');
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  font-family: Inter, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
