@@ -12,6 +12,18 @@ export const tick = (state: GameState): GameState => {
 
   const expectedGuestCount = getGuestsByReputation(state.reputation)
   const randomGuests = calculateRandomGuests(state.seed, expectedGuestCount)
+  const tableDegradation = degradeTable(
+    randomGuests.nextSeed,
+    state.tavern.tables
+  )
+
+  const stateWithDegradedTables: GameState = {
+    ...state,
+    tavern: {
+      ...state.tavern,
+      tables: tableDegradation.tables,
+    },
+  }
 
   const {
     seatedGuestCount,
@@ -20,14 +32,10 @@ export const tick = (state: GameState): GameState => {
     income,
     expenses,
     workingTables,
-  } = calculateWeek(state, randomGuests.guestCount)
+  } = calculateWeek(stateWithDegradedTables, randomGuests.guestCount)
 
   const guests = createGuests(seatedGuestCount, servedGuestCount, workingTables)
 
-  const tableDegradation = degradeTable(
-    randomGuests.nextSeed,
-    state.tavern.tables
-  )
   const brokenTables = tableDegradation.tables.filter(
     table => table.condition === 'broken'
   ).length

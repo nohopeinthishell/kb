@@ -32,12 +32,11 @@ export type TableState = {
 }
 
 export type GameAction =
-  | { type: 'repairTable'; tableId: number }
+  | { type: 'repairTable' }
   | { type: 'hireHelper' }
   | { type: 'buyProvision' }
 
 export type ActionError =
-  | 'TABLE_NOT_FOUND'
   | 'TABLE_DOES_NOT_NEED_REPAIR'
   | 'NOT_ENOUGH_GOLD'
   | 'HELPER_ALREADY_ACTIVE'

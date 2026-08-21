@@ -1,7 +1,7 @@
 import { GameState } from './types'
 
 export const initialGameState: GameState = {
-  week: 1,
+  week: 0,
   money: 1000,
   reputation: 50,
   provisionWeeks: 0,
@@ -11,20 +11,11 @@ export const initialGameState: GameState = {
   tavern: {
     tables: [
       { id: 1, condition: 'new' },
-      { id: 2, condition: 'broken' },
-      { id: 3, condition: 'worn' },
+      { id: 2, condition: 'new' },
+      { id: 3, condition: 'new' },
       { id: 4, condition: 'new' },
     ],
-    guests: [
-      { id: 0, tableId: 1, mood: 'happy' },
-      { id: 1, tableId: 1, mood: 'happy' },
-      { id: 2, tableId: 1, mood: 'neutral' },
-      { id: 3, tableId: 1, mood: 'unhappy' },
-      { id: 4, tableId: 3, mood: 'neutral' },
-      { id: 5, tableId: 3, mood: 'neutral' },
-      { id: 6, tableId: 4, mood: 'happy' },
-      { id: 7, tableId: 4, mood: 'happy' },
-    ],
+    guests: [],
     queueSize: 0,
     helperActive: false,
   },

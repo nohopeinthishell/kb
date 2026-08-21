@@ -28,15 +28,11 @@ export const applyAction = (
 
   switch (action.type) {
     case 'repairTable': {
-      const tableToRepair = state.tavern.tables.find(
-        t => t.id === action.tableId
-      )
+      const tableToRepair =
+        state.tavern.tables.find(table => table.condition === 'broken') ??
+        state.tavern.tables.find(table => table.condition === 'worn')
 
       if (!tableToRepair) {
-        return { ...state, lastActionError: 'TABLE_NOT_FOUND' }
-      }
-
-      if (tableToRepair.condition === 'new') {
         return { ...state, lastActionError: 'TABLE_DOES_NOT_NEED_REPAIR' }
       }
 
@@ -50,7 +46,9 @@ export const applyAction = (
         tavern: {
           ...state.tavern,
           tables: state.tavern.tables.map(table =>
-            table.id === action.tableId ? { ...table, condition: 'new' } : table
+            table.id === tableToRepair.id
+              ? { ...table, condition: 'new' }
+              : table
           ),
         },
         lastActionError: null,

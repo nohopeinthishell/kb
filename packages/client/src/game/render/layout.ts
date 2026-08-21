@@ -3,13 +3,6 @@ import type { DefaultTheme } from 'styled-components'
 import type { GuestState, TableState } from '../core'
 import type { SeatPosition, TableRect } from './types'
 
-export const TABLE_RECTS = [
-  { tableId: 1, x: 50, y: 70, width: 200, height: 150 },
-  { tableId: 2, x: 440, y: 70, width: 200, height: 150 },
-  { tableId: 3, x: 50, y: 460, width: 200, height: 150 },
-  { tableId: 4, x: 440, y: 460, width: 200, height: 150 },
-]
-
 export const calculatePositionByIndex = (
   index: number,
   table: TableRect
@@ -52,4 +45,35 @@ export const getColorByMood = (
     case 'unhappy':
       return theme.colors.game.guestUnhappy
   }
+}
+
+const positions = [
+  { x: 1 / 4, y: 1 / 4 }, // top-left
+  { x: 3 / 4, y: 1 / 4 }, // top-right
+  { x: 1 / 4, y: 3 / 4 }, // bottom-left
+  { x: 3 / 4, y: 3 / 4 }, // bottom-right
+]
+
+const TABLE_WIDTH = 200
+
+const TABLE_HEIGHT = 150
+
+export const calculateTableRects = (
+  width: number,
+  height: number,
+  tables: TableState[]
+): TableRect[] => {
+  return tables.map((table, idx) => {
+    const { x, y } = positions[idx]
+    const xPos = width * x - TABLE_WIDTH / 2
+    const yPos = height * y - TABLE_HEIGHT / 2
+
+    return {
+      tableId: table.id,
+      x: xPos,
+      y: yPos,
+      width: TABLE_WIDTH,
+      height: TABLE_HEIGHT,
+    }
+  })
 }

@@ -1,9 +1,9 @@
 import type { DefaultTheme } from 'styled-components'
 import {
   calculatePositionByIndex,
+  calculateTableRects,
   getColorByMood,
   getColorByTableCondition,
-  TABLE_RECTS,
 } from './layout'
 
 import type { SeatPosition, TableRect } from './types'
@@ -15,6 +15,11 @@ export const drawTavern = (
   state: GameState
 ): void => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  const tableRects = calculateTableRects(
+    ctx.canvas.width,
+    ctx.canvas.height,
+    state.tavern.tables
+  )
 
   ctx.save()
 
@@ -26,9 +31,7 @@ export const drawTavern = (
   ctx.shadowOffsetX = 5
   ctx.shadowOffsetY = 7
 
-  TABLE_RECTS.forEach(table =>
-    drawTable(ctx, table, state.tavern.tables, theme)
-  )
+  tableRects.forEach(table => drawTable(ctx, table, state.tavern.tables, theme))
 
   ctx.restore()
 
@@ -37,7 +40,7 @@ export const drawTavern = (
   ctx.lineWidth = 2
   ctx.strokeStyle = theme.colors.game.canvasLine
 
-  TABLE_RECTS.forEach(table => drawTableBoards(ctx, table))
+  tableRects.forEach(table => drawTableBoards(ctx, table))
 
   ctx.restore()
 
@@ -45,7 +48,7 @@ export const drawTavern = (
   ctx.lineWidth = 3
   ctx.strokeStyle = theme.colors.game.canvasLine
 
-  TABLE_RECTS.forEach(table => {
+  tableRects.forEach(table => {
     const guests = state.tavern.guests
       .filter(guest => guest.tableId === table.tableId)
       .slice(0, 4)
