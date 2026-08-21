@@ -1,41 +1,43 @@
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-const LinkUI = styled(Link)`
-  min-height: 56px;
-  padding: 0 28px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+const FormButton = styled.button`
+  min-height: 52px;
+  padding: 0 24px;
 
   background: ${({ theme }) => theme.colors.action.primary};
+  border: 0;
   border-radius: 12px;
 
   color: ${({ theme }) => theme.colors.action.primaryText};
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
 
+  cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
 
   @media (hover: hover) {
-    &:hover {
+    &:hover:not(:disabled) {
       background: ${({ theme }) => theme.colors.action.primaryHover};
       transform: translateY(-1px);
     }
   }
 
-  &:active {
+  &:active:not(:disabled) {
     background: ${({ theme }) => theme.colors.action.primaryActive};
     transform: translateY(0);
   }
 
   &:focus-visible {
     outline: 3px solid ${({ theme }) => theme.colors.border.focus};
-    outline-offset: 4px;
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    color: ${({ theme }) => theme.colors.action.disabledText};
+    background: ${({ theme }) => theme.colors.action.disabled};
+    cursor: not-allowed;
   }
 `
 
-export default LinkUI
+export default FormButton
