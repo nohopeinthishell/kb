@@ -1,4 +1,4 @@
-﻿export const ROUTES = {
+export const ROUTES = {
   main: '/',
   game: '/game',
   leaderboard: '/leaderboard',
