@@ -5,29 +5,15 @@ type FormUIProps = {
   title: string
   description: string
   children: ReactNode
-  errors?: string[]
   onSubmit?: FormEventHandler<HTMLFormElement>
 }
 
-const FormUI = ({
-  title,
-  description,
-  children,
-  errors = [],
-  onSubmit,
-}: FormUIProps) => (
+const FormUI = ({ title, description, children, onSubmit }: FormUIProps) => (
   <Form onSubmit={onSubmit} noValidate>
     <Header>
       <Title>{title}</Title>
       <Description>{description}</Description>
     </Header>
-    {errors.length > 0 && (
-      <Errors>
-        {errors.map((error, idx) => (
-          <li key={`${error}-${idx}`}>{error}</li>
-        ))}
-      </Errors>
-    )}
     {children}
   </Form>
 )
@@ -69,9 +55,9 @@ const Description = styled.p`
   font-size: 16px;
 `
 
-const Errors = styled.ul`
+export const FormError = styled.div`
   margin: 0;
-  padding: 12px 16px 12px 34px;
+  padding: 12px 16px;
 
   background: ${({ theme }) => theme.colors.feedback.dangerMuted};
   border-radius: 10px;

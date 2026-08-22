@@ -1,15 +1,41 @@
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
 import styled from 'styled-components'
 
 import { Helmet } from 'react-helmet-async'
+import { useNavigate } from 'react-router-dom'
+import { signIn } from '../../api'
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
-import FormUI from '../../ui/FormUI'
+import FormUI, { FormError } from '../../ui/FormUI'
 
 export const SignInPage = () => {
+  const navigate = useNavigate()
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    const data = new FormData(event.currentTarget)
+
+    setIsLoading(true)
+    setError(null)
+
+    signIn({
+      login: String(data.get('login') ?? ''),
+      password: String(data.get('password') ?? ''),
+    })
+      .then(() => navigate('/'))
+      .catch((requestError: unknown) =>
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'Не удалось связаться с сервером'
+        )
+      )
+      .finally(() => setIsLoading(false))
   }
 
   return (
@@ -37,7 +63,10 @@ export const SignInPage = () => {
             autoComplete="current-password"
           />
         </Fields>
-        <FormButton type="submit">Войти</FormButton>
+        {error && <FormError role="alert">{error}</FormError>}
+        <FormButton type="submit" disabled={isLoading}>
+          Войти
+        </FormButton>
         <Footer>
           <FooterText>Ещё нет аккаунта?</FooterText>
           <FormLink to="/sign-up">Зарегистрироваться</FormLink>
@@ -47,7 +76,9 @@ export const SignInPage = () => {
   )
 }
 
-export const initSignInPage = async () => Promise.resolve()
+export async function initSignInPage() {
+  return Promise.resolve()
+}
 
 const Page = styled.main`
   min-height: 100%;

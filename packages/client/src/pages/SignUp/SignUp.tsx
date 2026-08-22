@@ -1,15 +1,45 @@
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
 import styled from 'styled-components'
 
 import { Helmet } from 'react-helmet-async'
+import { useNavigate } from 'react-router-dom'
+import { signUp } from '../../api'
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
-import FormUI from '../../ui/FormUI'
+import FormUI, { FormError } from '../../ui/FormUI'
 
 export const SignUpPage = () => {
+  const navigate = useNavigate()
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    const data = new FormData(event.currentTarget)
+
+    setIsLoading(true)
+    setError(null)
+
+    signUp({
+      first_name: String(data.get('first_name') ?? ''),
+      second_name: String(data.get('second_name') ?? ''),
+      email: String(data.get('email') ?? ''),
+      phone: String(data.get('phone') ?? ''),
+      login: String(data.get('login') ?? ''),
+      password: String(data.get('password') ?? ''),
+    })
+      .then(() => navigate('/'))
+      .catch((requestError: unknown) =>
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'Не удалось связаться с сервером'
+        )
+      )
+      .finally(() => setIsLoading(false))
   }
 
   return (
@@ -66,7 +96,10 @@ export const SignUpPage = () => {
             autoComplete="new-password"
           />
         </Fields>
-        <FormButton type="submit">Зарегистрироваться</FormButton>
+        {error && <FormError role="alert">{error}</FormError>}
+        <FormButton type="submit" disabled={isLoading}>
+          Зарегистрироваться
+        </FormButton>
         <Footer>
           <FooterText>Уже есть аккаунт?</FooterText>
           <FormLink to="/sign-in">Войти</FormLink>
@@ -76,7 +109,9 @@ export const SignUpPage = () => {
   )
 }
 
-export const initSignUpPage = async () => Promise.resolve()
+export async function initSignUpPage() {
+  return Promise.resolve()
+}
 
 const Page = styled.main`
   min-height: 100%;
