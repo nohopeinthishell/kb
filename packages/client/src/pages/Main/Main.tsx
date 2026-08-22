@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import LinkUI from '../../ui/LinkUI'
 import { ROUTES } from '../../constants/routes'
 // Vite отдаёт из импорта картинки готовый URL, а не сам файл
-import tavernBg from './tavern.jpg'
+import tavernBg from './tavern.webp'
 
 export const MainPage = () => (
   <Page>
