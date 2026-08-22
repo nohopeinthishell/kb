@@ -2,9 +2,13 @@ import styled from 'styled-components'
 import { Helmet } from 'react-helmet-async'
 import LinkUI from '../../ui/LinkUI'
 import { ROUTES } from '../../constants/routes'
+// Vite отдаёт из импорта картинки готовый URL, а не сам файл
+import tavernBg from './tavern.jpg'
 
 export const MainPage = () => (
   <Page>
+    <Backdrop />
+
     <Helmet>
       <title>Таверна</title>
     </Helmet>
@@ -51,6 +55,8 @@ export const MainPage = () => (
 )
 
 const Page = styled.main`
+  position: relative; /* якорь для Backdrop */
+  isolation: isolate; /* свой контекст наложения: иначе z-index: -1 уйдёт за фон body */
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -59,6 +65,20 @@ const Page = styled.main`
   justify-content: center;
   min-height: 100%;
   padding: clamp(24px, 5vw, 64px);
+`
+
+const Backdrop = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: ${({ theme }) =>
+      theme.name === 'dark'
+        ? 'linear-gradient(rgba(18, 17, 15, 0.55), rgba(18, 17, 15, 0.82))'
+        : 'radial-gradient(120% 90% at 50% 45%, rgba(244, 241, 234, 0.84), rgba(244, 241, 234, 0.52) 55%, rgba(244, 241, 234, 0.34))'},
+    url(${tavernBg});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 `
 
 const Content = styled.div`
