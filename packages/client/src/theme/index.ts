@@ -30,7 +30,9 @@ export interface ThemeColors {
     primaryActive: string
     primaryText: string
     secondary: string
+    secondaryText: string
     secondaryHover: string
+    secondaryActive: string
     disabled: string
     disabledText: string
   }
@@ -96,7 +98,9 @@ export const darkTheme: AppTheme = {
       primaryActive: '#5843ad',
       primaryText: '#ffffff',
       secondary: '#292927',
+      secondaryText: '#f1ede5',
       secondaryHover: '#353532',
+      secondaryActive: '#20201e',
       disabled: '#3a3936',
       disabledText: '#777169',
     },
@@ -158,7 +162,9 @@ export const lightTheme: AppTheme = {
       primaryActive: '#402f87',
       primaryText: '#ffffff',
       secondary: '#eeece6',
+      secondaryText: '#24221f',
       secondaryHover: '#e1ddd4',
+      secondaryActive: '#d3cec3',
       disabled: '#dedad1',
       disabledText: '#989187',
     },
