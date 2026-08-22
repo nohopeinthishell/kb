@@ -13,7 +13,7 @@ export const MainPage = () => (
       <title>Таверна</title>
     </Helmet>
 
-    <Content>
+    <WidthLimiter>
       <Header>
         <Title>Таверна</Title>
         <Description>
@@ -25,7 +25,7 @@ export const MainPage = () => (
         </Description>
       </Header>
       <Content>
-        <Nav>
+        <nav>
           <MenuList>
             <li>
               <LinkUI to={ROUTES.game} $variant="primary">
@@ -48,9 +48,9 @@ export const MainPage = () => (
               </LinkUI>
             </li>
           </MenuList>
-        </Nav>
+        </nav>
       </Content>
-    </Content>
+    </WidthLimiter>
   </Page>
 )
 
@@ -60,21 +60,24 @@ const Page = styled.main`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  height: 100%;
   align-items: center;
   justify-content: center;
   min-height: 100%;
   padding: clamp(24px, 5vw, 64px);
 `
 
+const WidthLimiter = styled.div`
+  width: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`
+
 const Backdrop = styled.div`
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: ${({ theme }) =>
-      theme.name === 'dark'
-        ? 'linear-gradient(rgba(18, 17, 15, 0.55), rgba(18, 17, 15, 0.82))'
-        : 'radial-gradient(120% 90% at 50% 45%, rgba(244, 241, 234, 0.84), rgba(244, 241, 234, 0.52) 55%, rgba(244, 241, 234, 0.34))'},
+  background-image: ${({ theme }) => theme.colors.background.imageScrim},
     url(${tavernBg});
   background-size: cover;
   background-position: center;
@@ -82,7 +85,6 @@ const Backdrop = styled.div`
 `
 
 const Content = styled.div`
-  width: min(100%, 560px);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -96,7 +98,7 @@ const Header = styled.header`
 `
 
 const Title = styled.h1`
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 48px;
 `
 
@@ -106,8 +108,6 @@ const Description = styled.p`
   font-size: clamp(15px, 2vw, 18px);
   line-height: 1.6;
 `
-
-const Nav = styled.nav``
 
 const MenuList = styled.ul`
   display: flex;

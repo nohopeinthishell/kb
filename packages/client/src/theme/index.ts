@@ -9,6 +9,7 @@ export interface ThemeColors {
     surfaceMuted: string
     surfaceElevated: string
     overlay: string
+    imageScrim: string
   }
   text: {
     primary: string
@@ -77,6 +78,8 @@ export const darkTheme: AppTheme = {
       surfaceMuted: '#292927',
       surfaceElevated: '#31312f',
       overlay: 'rgba(0, 0, 0, 0.64)',
+      imageScrim:
+        'linear-gradient(rgba(18, 17, 15, 0.55), rgba(18, 17, 15, 0.82))',
     },
     text: {
       primary: '#f1ede5',
@@ -141,6 +144,8 @@ export const lightTheme: AppTheme = {
       surfaceMuted: '#eeece6',
       surfaceElevated: '#f8f7f3',
       overlay: 'rgba(28, 27, 25, 0.4)',
+      imageScrim:
+        'radial-gradient(120% 90% at 50% 45%, rgba(244, 241, 234, 0.84), rgba(244, 241, 234, 0.52) 55%, rgba(244, 241, 234, 0.34))',
     },
     text: {
       primary: '#24221f',
