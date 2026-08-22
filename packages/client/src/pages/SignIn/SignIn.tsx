@@ -1,6 +1,7 @@
 import { FormEvent } from 'react'
 import styled from 'styled-components'
 
+import { Helmet } from 'react-helmet-async'
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
@@ -13,6 +14,9 @@ export const SignInPage = () => {
 
   return (
     <Page>
+      <Helmet>
+        <title>Вход | Таверна</title>
+      </Helmet>
       <FormUI
         title="Добро пожаловать"
         description="Войдите, чтобы управлять таверной"
