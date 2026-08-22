@@ -23,8 +23,8 @@ const FormUI = ({
     </Header>
     {errors.length > 0 && (
       <Errors>
-        {errors.map(error => (
-          <li key={error}>{error}</li>
+        {errors.map((error, idx) => (
+          <li key={`${error}-${idx}`}>{error}</li>
         ))}
       </Errors>
     )}
