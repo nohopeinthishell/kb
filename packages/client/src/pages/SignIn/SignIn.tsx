@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
-import { signIn } from '../../api'
+import { ApiError, signIn } from '../../api'
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
@@ -30,7 +30,7 @@ export const SignInPage = () => {
       .then(() => navigate('/'))
       .catch((requestError: unknown) =>
         setError(
-          requestError instanceof Error
+          requestError instanceof ApiError
             ? requestError.message
             : 'Не удалось связаться с сервером'
         )

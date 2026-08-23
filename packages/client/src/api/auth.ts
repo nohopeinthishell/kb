@@ -29,10 +29,17 @@ type ApiErrorBody = {
   reason?: string
 }
 
-export async function request<Response>(
+export class ApiError extends Error {
+  constructor(message: string, public readonly statusCode: number) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
+export async function request<TResponse>(
   path: string,
   init?: RequestInit
-): Promise<Response> {
+): Promise<TResponse> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     credentials: 'include',
@@ -44,15 +51,18 @@ export async function request<Response>(
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as ApiErrorBody
-    throw new Error(body.reason ?? 'Не удалось выполнить запрос')
+    throw new ApiError(
+      body.reason ?? 'Не удалось выполнить запрос',
+      response.status
+    )
   }
 
   const contentType = response.headers.get('content-type')
   if (!contentType?.includes('application/json')) {
-    return undefined as Response
+    return undefined as TResponse
   }
 
-  return response.json() as Promise<Response>
+  return response.json() as Promise<TResponse>
 }
 
 export function getCurrentUser() {
@@ -63,12 +73,6 @@ export async function signIn(data: SignInRequest) {
   return request('/auth/signin', {
     method: 'POST',
     body: JSON.stringify(data),
-  }).catch((error: unknown) => {
-    if (error instanceof Error && error.message === 'User already in system') {
-      return
-    }
-
-    throw error
   })
 }
 
@@ -76,11 +80,5 @@ export async function signUp(data: SignUpRequest) {
   return request('/auth/signup', {
     method: 'POST',
     body: JSON.stringify(data),
-  }).catch((error: unknown) => {
-    if (error instanceof Error && error.message === 'User already in system') {
-      return
-    }
-
-    throw error
   })
 }

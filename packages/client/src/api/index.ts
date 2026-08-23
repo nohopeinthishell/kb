@@ -1,4 +1,5 @@
 export {
+  ApiError,
   getCurrentUser,
   signIn,
   signUp,
