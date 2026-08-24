@@ -18,13 +18,17 @@ import {
   RandomGuestsResult,
   TableDegradationResult,
   TableState,
+  EventEffectType,
 } from './types'
+import { EVENTS } from './events'
 
 export const applyAction = (
   state: GameState,
   action: GameAction
 ): GameState => {
   if (state.status !== 'playing') return state
+
+  if (state.currentEventId !== null && action.type !== 'event') return state
 
   switch (action.type) {
     case 'repairTable': {
@@ -87,6 +91,47 @@ export const applyAction = (
         ...state,
         money: state.money - GOLD_TO_BUY_PROVISION,
         provisionWeeks: PROVISION_DURATION_WEEKS,
+        lastActionError: null,
+      }
+    }
+
+    case 'event': {
+      if (state.currentEventId !== action.eventId) return state
+
+      const foundEvent = EVENTS.find(event => event.id === action.eventId)
+
+      if (!foundEvent) return state
+
+      const chosenVariant = foundEvent.choices.find(
+        choice => choice.id === action.choiceId
+      )
+
+      if (!chosenVariant) return state
+
+      const effects = chosenVariant.effects
+
+      const changedFields = effects.reduce<Pick<GameState, EventEffectType>>(
+        (acc, effect) => {
+          const { type, value } = effect
+          return {
+            ...acc,
+            [type]: acc[type] + value,
+          }
+        },
+        {
+          money: state.money,
+          reputation: state.reputation,
+        }
+      )
+
+      const reputation = Math.min(100, Math.max(0, changedFields.reputation))
+
+      return {
+        ...state,
+        money: changedFields.money,
+        reputation,
+        status: changedFields.money < 0 ? 'lost' : state.status,
+        currentEventId: null,
         lastActionError: null,
       }
     }

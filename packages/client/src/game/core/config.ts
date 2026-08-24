@@ -23,4 +23,5 @@ export const initialGameState: GameState = {
   lastActionError: null,
 
   currentEventId: null,
+  usedEventIds: [],
 }

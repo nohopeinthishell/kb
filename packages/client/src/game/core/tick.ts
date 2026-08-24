@@ -4,11 +4,16 @@ import {
   createGuests,
   degradeTable,
 } from './actions'
+import { checkEventConditions, EVENTS, selectRandomEvent } from './events'
 import { calculateWeek, getGuestsByReputation } from './forecast'
 import { GameState } from './types'
 
 export const tick = (state: GameState): GameState => {
   if (state.status !== 'playing') return state
+
+  if (state.currentEventId !== null) {
+    return { ...state, lastActionError: 'EVENT_CHOICE_REQUIRED' }
+  }
 
   const expectedGuestCount = getGuestsByReputation(state.reputation)
   const randomGuests = calculateRandomGuests(state.seed, expectedGuestCount)
@@ -52,15 +57,31 @@ export const tick = (state: GameState): GameState => {
   )
 
   const isFinalWeek = state.week >= 6
+  const availableEvents = isFinalWeek
+    ? []
+    : EVENTS.filter(
+        event =>
+          !state.usedEventIds.includes(event.id) &&
+          event.selection === 'random' &&
+          checkEventConditions(event.conditions, state)
+      )
+  const selectedEvent = selectRandomEvent(
+    tableDegradation.nextSeed,
+    availableEvents
+  )
 
   const newState: GameState = {
     ...state,
     money: state.money + income - expenses,
     reputation,
-    seed: tableDegradation.nextSeed,
+    seed: selectedEvent.nextSeed,
     week: isFinalWeek ? 6 : state.week + 1,
     provisionWeeks: state.provisionWeeks > 0 ? state.provisionWeeks - 1 : 0,
     lastActionError: null,
+    currentEventId: selectedEvent.eventId,
+    usedEventIds: selectedEvent.eventId
+      ? [...state.usedEventIds, selectedEvent.eventId]
+      : state.usedEventIds,
     tavern: {
       ...state.tavern,
       tables: tableDegradation.tables,

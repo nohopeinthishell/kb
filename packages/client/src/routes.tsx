@@ -25,4 +25,8 @@ export const routes = [
     Component: NotFoundPage,
     fetchData: initNotFoundPage,
   },
+  {
+    path: '/game',
+    Component: GameScreen,
+  },
 ]

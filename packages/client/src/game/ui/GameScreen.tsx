@@ -2,6 +2,8 @@ import { useState } from 'react'
 import styled from 'styled-components'
 
 import { applyAction, GameAction, initialGameState, tick } from '../core'
+import events from '../events.json'
+import EventCard from './EventCard'
 import TavernCanvas from './TavernCanvas'
 
 const GameScreen = () => {
@@ -13,6 +15,21 @@ const GameScreen = () => {
 
   const handleApplyAction = (type: GameAction) => {
     setState(currentState => applyAction(currentState, type))
+  }
+
+  const currentEvent =
+    events.find(event => event.id === state.currentEventId) ?? null
+  const hasPendingEvent = state.currentEventId !== null
+  const isGameFinished = state.status !== 'playing'
+
+  const handleEventChoice = (choiceId: string) => {
+    if (!currentEvent) return
+
+    handleApplyAction({
+      type: 'event',
+      eventId: currentEvent.id,
+      choiceId,
+    })
   }
 
   return (
@@ -27,32 +44,38 @@ const GameScreen = () => {
         <TavernCanvas state={state} />
       </CanvasFrame>
 
+      <EventCard
+        event={currentEvent}
+        disabled={isGameFinished}
+        onChoice={handleEventChoice}
+      />
+
       <Controls>
         <ActionButton
           type="button"
           onClick={() => handleApplyAction({ type: 'repairTable' })}
-          disabled={state.status !== 'playing'}>
+          disabled={isGameFinished || hasPendingEvent}>
           Починить стол
         </ActionButton>
 
         <ActionButton
           type="button"
           onClick={() => handleApplyAction({ type: 'hireHelper' })}
-          disabled={state.status !== 'playing'}>
+          disabled={isGameFinished || hasPendingEvent}>
           Нанять помощника
         </ActionButton>
 
         <ActionButton
           type="button"
           onClick={() => handleApplyAction({ type: 'buyProvision' })}
-          disabled={state.status !== 'playing'}>
+          disabled={isGameFinished || hasPendingEvent}>
           Закупить провизию
         </ActionButton>
 
         <NextWeekButton
           type="button"
           onClick={handleNextWeek}
-          disabled={state.status !== 'playing'}>
+          disabled={isGameFinished || hasPendingEvent}>
           {state.status === 'playing'
             ? 'Следующая неделя'
             : state.status === 'won'
@@ -95,6 +118,7 @@ const CanvasFrame = styled.div`
 
 const Controls = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
 `

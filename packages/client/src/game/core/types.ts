@@ -18,6 +18,8 @@ export type GameState = {
   lastActionError: ActionError | null
 
   currentEventId: string | null
+
+  usedEventIds: string[]
 }
 
 export type GuestState = {
@@ -35,12 +37,14 @@ export type GameAction =
   | { type: 'repairTable' }
   | { type: 'hireHelper' }
   | { type: 'buyProvision' }
+  | { type: 'event'; eventId: string; choiceId: string }
 
 export type ActionError =
   | 'TABLE_DOES_NOT_NEED_REPAIR'
   | 'NOT_ENOUGH_GOLD'
   | 'HELPER_ALREADY_ACTIVE'
   | 'PROVISIONS_ALREADY_ACTIVE'
+  | 'EVENT_CHOICE_REQUIRED'
 
 export type SeatingResult = {
   seatedGuestCount: number
@@ -72,4 +76,35 @@ export type RandomGuestsResult = {
 export type TableDegradationResult = {
   tables: TableState[]
   nextSeed: number
+}
+
+export type GameEvent = {
+  id: string
+  title: string
+  description: string
+  weight: number
+  conditions: []
+  choices: EventChoice[]
+  selection: 'random' | 'scheduled'
+}
+
+export type EventEffectType = 'money' | 'reputation'
+
+export type EventEffect = {
+  type: EventEffectType
+  value: number
+}
+
+export type EventChoice = {
+  id: string
+  label: string
+  hint: string
+  effects: EventEffect[]
+}
+
+export type Condition = {
+  type: 'stat'
+  field: EventEffectType
+  operator: 'gte' | 'lte'
+  value: number
 }
