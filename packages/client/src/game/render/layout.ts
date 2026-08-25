@@ -64,7 +64,7 @@ export const calculateTableRects = (
   tables: TableState[]
 ): TableRect[] => {
   return tables.map((table, idx) => {
-    const { x, y } = positions[idx]
+    const { x, y } = positions[table.id - 1]
     const xPos = width * x - TABLE_WIDTH / 2
     const yPos = height * y - TABLE_HEIGHT / 2
 

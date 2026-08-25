@@ -44,11 +44,7 @@ const GameScreen = () => {
         <TavernCanvas state={state} />
       </CanvasFrame>
 
-      <EventCard
-        event={currentEvent}
-        disabled={isGameFinished}
-        onChoice={handleEventChoice}
-      />
+      <EventCard event={currentEvent} onChoice={handleEventChoice} />
 
       <Controls>
         <ActionButton

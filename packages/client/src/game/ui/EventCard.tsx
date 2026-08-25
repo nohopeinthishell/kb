@@ -13,11 +13,10 @@ type EventCardData = {
 
 type EventCardProps = {
   event: EventCardData | null
-  disabled: boolean
   onChoice: (choiceId: string) => void
 }
 
-const EventCard = ({ event, disabled, onChoice }: EventCardProps) => {
+const EventCard = ({ event, onChoice }: EventCardProps) => {
   if (!event) {
     return (
       <Card aria-live="polite">
@@ -37,7 +36,6 @@ const EventCard = ({ event, disabled, onChoice }: EventCardProps) => {
           <ChoiceButton
             key={choice.id}
             type="button"
-            disabled={disabled}
             onClick={() => onChoice(choice.id)}>
             <ChoiceLabel>{choice.label}</ChoiceLabel>
             <ChoiceHint>{choice.hint}</ChoiceHint>

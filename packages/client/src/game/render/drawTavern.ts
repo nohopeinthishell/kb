@@ -12,14 +12,12 @@ import type { GameState, GuestState, TableState } from '../core'
 export const drawTavern = (
   ctx: CanvasRenderingContext2D,
   theme: DefaultTheme,
-  state: GameState
+  state: GameState,
+  width = ctx.canvas.width,
+  height = ctx.canvas.height
 ): void => {
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  const tableRects = calculateTableRects(
-    ctx.canvas.width,
-    ctx.canvas.height,
-    state.tavern.tables
-  )
+  ctx.clearRect(0, 0, width, height)
+  const tableRects = calculateTableRects(width, height, state.tavern.tables)
 
   ctx.save()
 
