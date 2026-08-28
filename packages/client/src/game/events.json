@@ -1,0 +1,433 @@
+[
+  {
+    "id": "city_guard_inspection",
+    "title": "Проверка городской стражи",
+    "description": "Капитан обнаружил нарушения в документах таверны и предлагает решить вопрос на месте.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "pay_fine",
+        "label": "Заплатить штраф",
+        "hint": "Казна -300",
+        "effects": [{ "type": "money", "value": -300 }]
+      },
+      {
+        "id": "refuse_guard",
+        "label": "Отказаться платить",
+        "hint": "Репутация -8, на этой неделе не будет гостей",
+        "effects": [{ "type": "reputation", "value": -8 }],
+        "delayedEffects": [
+          {
+            "type": "timedModifier",
+            "id": "guard_week_without_guests",
+            "target": "guestMultiplier",
+            "value": 0,
+            "delayWeeks": 0,
+            "durationWeeks": 1
+          }
+        ]
+      },
+      {
+        "id": "ask_elder_for_help",
+        "label": "Позвать старосту",
+        "hint": "50% без последствий, 50% репутация -12",
+        "effects": [],
+        "randomOutcomes": [
+          {
+            "id": "elder_success",
+            "weight": 1,
+            "effects": []
+          },
+          {
+            "id": "elder_failure",
+            "weight": 1,
+            "effects": [{ "type": "reputation", "value": -12 }]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cheap_ale_offer",
+    "title": "Дешёвый эль",
+    "description": "Заезжий торговец предлагает подозрительно дешёвую бочку эля. Прибыль выглядит заманчиво.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "buy_cheap_ale",
+        "label": "Купить бочку",
+        "hint": "Казна -150, доход x1.15 на 3 недели, жалобы через 1 неделю",
+        "effects": [{ "type": "money", "value": -150 }],
+        "delayedEffects": [
+          {
+            "type": "timedModifier",
+            "id": "cheap_ale_income",
+            "target": "incomeMultiplier",
+            "value": 1.15,
+            "delayWeeks": 0,
+            "durationWeeks": 3
+          },
+          {
+            "type": "scheduleEvent",
+            "eventId": "ale_complaints",
+            "delayWeeks": 1
+          }
+        ]
+      },
+      {
+        "id": "refuse_cheap_ale",
+        "label": "Отказаться",
+        "hint": "Без изменений",
+        "effects": []
+      }
+    ]
+  },
+  {
+    "id": "ale_complaints",
+    "title": "Гости жалуются на эль",
+    "description": "Посетители распробовали дешёвый эль и требуют разобраться с неприятным вкусом.",
+    "weight": 1,
+    "selection": "scheduled",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "discard_cheap_ale",
+        "label": "Вылить остатки",
+        "hint": "Репутация +2, бонус дешёвого эля прекращается",
+        "effects": [{ "type": "reputation", "value": 2 }],
+        "delayedEffects": [
+          {
+            "type": "removeModifier",
+            "modifierId": "cheap_ale_income",
+            "delayWeeks": 0
+          }
+        ]
+      },
+      {
+        "id": "keep_serving_cheap_ale",
+        "label": "Продолжить подавать",
+        "hint": "Репутация -10, бонус дешёвого эля сохраняется",
+        "effects": [{ "type": "reputation", "value": -10 }]
+      }
+    ]
+  },
+  {
+    "id": "rival_tavern",
+    "title": "Новая таверна по соседству",
+    "description": "Неподалёку открылось новое заведение и переманивает ваших постоянных гостей.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [
+      {
+        "type": "stat",
+        "field": "reputation",
+        "operator": "gte",
+        "value": 60
+      }
+    ],
+    "choices": [
+      {
+        "id": "launch_advertising",
+        "label": "Провести рекламную неделю",
+        "hint": "Казна -180, репутация +6",
+        "effects": [
+          { "type": "money", "value": -180 },
+          { "type": "reputation", "value": 6 }
+        ]
+      },
+      {
+        "id": "ignore_rival",
+        "label": "Не обращать внимания",
+        "hint": "Репутация -8",
+        "effects": [{ "type": "reputation", "value": -8 }]
+      },
+      {
+        "id": "cooperate_with_rival",
+        "label": "Договориться о сотрудничестве",
+        "hint": "Казна +100, репутация -3",
+        "effects": [
+          { "type": "money", "value": 100 },
+          { "type": "reputation", "value": -3 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "debt_notice",
+    "title": "Старый долг",
+    "description": "Кредитор напоминает о старом долге и требует расплатиться до конца недели.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [
+      {
+        "type": "stat",
+        "field": "money",
+        "operator": "lte",
+        "value": 200
+      }
+    ],
+    "choices": [
+      {
+        "id": "pay_debt",
+        "label": "Выплатить долг",
+        "hint": "Казна -180",
+        "effects": [{ "type": "money", "value": -180 }]
+      },
+      {
+        "id": "negotiate_debt",
+        "label": "Договориться о скидке",
+        "hint": "Казна -80, репутация -4",
+        "effects": [
+          { "type": "money", "value": -80 },
+          { "type": "reputation", "value": -4 }
+        ]
+      },
+      {
+        "id": "refuse_debt",
+        "label": "Отказаться платить",
+        "hint": "Репутация -10",
+        "effects": [{ "type": "reputation", "value": -10 }]
+      }
+    ]
+  },
+  {
+    "id": "marta_raise",
+    "title": "Марта просит прибавку",
+    "description": "Марта напоминает, что работает в таверне уже четвёртый год и заслуживает прибавку.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "grant_marta_raise",
+        "label": "Дать прибавку",
+        "hint": "Репутация +4, расходы +20 зол. в неделю до конца партии",
+        "effects": [{ "type": "reputation", "value": 4 }],
+        "delayedEffects": [
+          {
+            "type": "timedModifier",
+            "id": "marta_weekly_raise",
+            "target": "weeklyExpenses",
+            "value": 20,
+            "delayWeeks": 0,
+            "durationWeeks": "untilGameEnd"
+          }
+        ]
+      },
+      {
+        "id": "refuse_marta_raise",
+        "label": "Отказать",
+        "hint": "40% репутация -8, 60% без последствий",
+        "effects": [],
+        "randomOutcomes": [
+          {
+            "id": "marta_stays",
+            "weight": 6,
+            "effects": []
+          },
+          {
+            "id": "marta_is_offended",
+            "weight": 4,
+            "effects": [{ "type": "reputation", "value": -8 }]
+          }
+        ]
+      },
+      {
+        "id": "promise_marta_raise",
+        "label": "Пообещать вернуться к разговору",
+        "hint": "Через 3 недели репутация -5",
+        "effects": [],
+        "delayedEffects": [
+          {
+            "type": "stat",
+            "field": "reputation",
+            "value": -5,
+            "delayWeeks": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "leaking_roof",
+    "title": "Протекающая крыша",
+    "description": "После ночного ливня над залом появилась течь. Посетители уже пересаживаются подальше от капель.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "repair_roof",
+        "label": "Срочно вызвать кровельщика",
+        "hint": "Казна -220, репутация +3",
+        "effects": [
+          { "type": "money", "value": -220 },
+          { "type": "reputation", "value": 3 }
+        ]
+      },
+      {
+        "id": "place_buckets",
+        "label": "Расставить вёдра",
+        "hint": "Казна -30, через 2 недели репутация -8",
+        "effects": [{ "type": "money", "value": -30 }],
+        "delayedEffects": [
+          {
+            "type": "stat",
+            "field": "reputation",
+            "value": -8,
+            "delayWeeks": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lost_purse",
+    "title": "Забытый кошель",
+    "description": "После шумной ночи под столом нашли тяжёлый кошель с гербом купеческой гильдии.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "return_purse",
+        "label": "Вернуть владельцу",
+        "hint": "Репутация +9",
+        "effects": [{ "type": "reputation", "value": 9 }]
+      },
+      {
+        "id": "keep_purse",
+        "label": "Оставить кошель себе",
+        "hint": "Казна +170, репутация -7",
+        "effects": [
+          { "type": "money", "value": 170 },
+          { "type": "reputation", "value": -7 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "traveling_bard",
+    "title": "Странствующий бард",
+    "description": "Известный бард предлагает выступить в таверне и обещает собрать полный зал.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "hire_bard",
+        "label": "Нанять барда",
+        "hint": "Казна -140, репутация +7",
+        "effects": [
+          { "type": "money", "value": -140 },
+          { "type": "reputation", "value": 7 }
+        ]
+      },
+      {
+        "id": "send_bard_away",
+        "label": "Отказать",
+        "hint": "Репутация -2",
+        "effects": [{ "type": "reputation", "value": -2 }]
+      }
+    ]
+  },
+  {
+    "id": "noble_feast",
+    "title": "Пир для дворян",
+    "description": "Посланник барона хочет закрыть таверну для большого пира. Обычным гостям это не понравится.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [
+      {
+        "type": "stat",
+        "field": "reputation",
+        "operator": "gte",
+        "value": 45
+      }
+    ],
+    "choices": [
+      {
+        "id": "accept_feast",
+        "label": "Принять заказ",
+        "hint": "Казна +260, репутация -5",
+        "effects": [
+          { "type": "money", "value": 260 },
+          { "type": "reputation", "value": -5 }
+        ]
+      },
+      {
+        "id": "refuse_feast",
+        "label": "Оставить зал открытым для всех",
+        "hint": "Репутация +4",
+        "effects": [{ "type": "reputation", "value": 4 }]
+      }
+    ]
+  },
+  {
+    "id": "cellar_rats",
+    "title": "Крысы в погребе",
+    "description": "Повар обнаружил следы крыс рядом с запасами. Если слух разойдётся, гости будут недовольны.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [],
+    "choices": [
+      {
+        "id": "hire_ratcatcher",
+        "label": "Позвать крысолова",
+        "hint": "Казна -160, репутация +2",
+        "effects": [
+          { "type": "money", "value": -160 },
+          { "type": "reputation", "value": 2 }
+        ]
+      },
+      {
+        "id": "hide_rat_problem",
+        "label": "Скрыть проблему",
+        "hint": "Казна +60, репутация -9",
+        "effects": [
+          { "type": "money", "value": 60 },
+          { "type": "reputation", "value": -9 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "harvest_festival",
+    "title": "Праздник урожая",
+    "description": "Жители готовятся к празднику урожая и выбирают таверну для общего застолья.",
+    "weight": 1,
+    "selection": "random",
+    "conditions": [
+      {
+        "type": "stat",
+        "field": "reputation",
+        "operator": "gte",
+        "value": 40
+      }
+    ],
+    "choices": [
+      {
+        "id": "host_festival",
+        "label": "Устроить праздник",
+        "hint": "Казна -120, репутация +10",
+        "effects": [
+          { "type": "money", "value": -120 },
+          { "type": "reputation", "value": 10 }
+        ]
+      },
+      {
+        "id": "sell_festival_tables",
+        "label": "Сдать столы торговцам",
+        "hint": "Казна +230, репутация -6",
+        "effects": [
+          { "type": "money", "value": 230 },
+          { "type": "reputation", "value": -6 }
+        ]
+      }
+    ]
+  }
+]

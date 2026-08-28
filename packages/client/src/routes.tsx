@@ -3,6 +3,7 @@ import { AppDispatch, RootState } from './store'
 import { initMainPage, MainPage } from './pages/Main'
 import { initNotFoundPage, NotFoundPage } from './pages/NotFound'
 import { ROUTES } from './constants/routes'
+import { GameScreen } from './game/ui'
 
 export type PageInitContext = {
   clientToken?: string
@@ -24,5 +25,9 @@ export const routes = [
     path: '*',
     Component: NotFoundPage,
     fetchData: initNotFoundPage,
+  },
+  {
+    path: ROUTES.game,
+    Component: GameScreen,
   },
 ]
