@@ -28,7 +28,7 @@ export const MainPage = () => (
         <nav>
           <MenuList>
             <li>
-              <LinkUI to={ROUTES.game} $variant="primary">
+              <LinkUI to={ROUTES.startGame} $variant="primary">
                 Играть
               </LinkUI>
             </li>
