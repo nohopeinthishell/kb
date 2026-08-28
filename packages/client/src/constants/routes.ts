@@ -12,6 +12,7 @@ export const ROUTES = {
   profile: '/profile',
   signIn: '/sign-in',
   signUp: '/sign-up',
+  serverError: '/500',
 } as const
 
 export const topicPath = (topicId: number) => {
