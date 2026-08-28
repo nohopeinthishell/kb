@@ -83,7 +83,7 @@ export type GameEvent = {
   title: string
   description: string
   weight: number
-  conditions: []
+  conditions: Condition[]
   choices: EventChoice[]
   selection: 'random' | 'scheduled'
 }

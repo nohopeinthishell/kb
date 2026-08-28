@@ -2,7 +2,7 @@ import { useState } from 'react'
 import styled from 'styled-components'
 
 import { applyAction, GameAction, initialGameState, tick } from '../core'
-import events from '../events.json'
+import { EVENTS } from '../core/events'
 import EventCard from './EventCard'
 import TavernCanvas from './TavernCanvas'
 
@@ -18,7 +18,7 @@ const GameScreen = () => {
   }
 
   const currentEvent =
-    events.find(event => event.id === state.currentEventId) ?? null
+    EVENTS.find(event => event.id === state.currentEventId) ?? null
   const hasPendingEvent = state.currentEventId !== null
   const isGameFinished = state.status !== 'playing'
 

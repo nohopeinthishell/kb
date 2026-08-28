@@ -1,7 +1,7 @@
 import { GameState } from './types'
 
 export const initialGameState: GameState = {
-  week: 0,
+  week: 1,
   money: 1000,
   reputation: 50,
   provisionWeeks: 0,
