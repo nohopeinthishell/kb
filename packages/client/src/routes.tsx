@@ -11,6 +11,7 @@ import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
 import { ProtectedRoute, PublicOnlyRoute } from './modules/auth'
+import { initStartGamePage, StartGamePage } from './pages/StartGame'
 import { ServerError } from './pages/ServerError'
 
 export type PageInitContext = {
@@ -68,6 +69,15 @@ export const routes = [
         <ServerError />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: ROUTES.startGame,
+    element: (
+      <ProtectedRoute>
+        <StartGamePage />
+      </ProtectedRoute>
+    ),
+    fetchData: initStartGamePage,
   },
   {
     path: '*',

@@ -2,6 +2,7 @@ import { generatePath } from 'react-router-dom'
 
 export const ROUTES = {
   main: '/',
+  startGame: '/start-game',
   game: '/game',
   leaderboard: '/leaderboard',
   forum: {
