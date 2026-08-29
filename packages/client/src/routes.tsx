@@ -6,9 +6,11 @@ import { ROUTES } from './constants/routes'
 import { GameScreen } from './game/ui'
 import { SignInPage } from './pages/SignIn'
 import { SignUpPage } from './pages/SignUp'
+import { initProfilePage, ProfilePage } from './pages/Profile'
 
 export type PageInitContext = {
   clientToken?: string
+  cookie?: string
 }
 
 export type PageInitArgs = {
@@ -30,6 +32,11 @@ export const routes = [
   {
     path: ROUTES.signUp,
     Component: SignUpPage,
+  },
+  {
+    path: ROUTES.profile,
+    Component: ProfilePage,
+    fetchData: initProfilePage,
   },
   {
     path: '*',

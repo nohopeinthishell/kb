@@ -99,7 +99,7 @@ export const SignUpPage = () => {
         </Fields>
         {error && <FormError role="alert">{error}</FormError>}
         <FormButton type="submit" disabled={isLoading}>
-          Зарегистрироваться
+          {isLoading ? 'Регистрация…' : 'Зарегистрироваться'}
         </FormButton>
         <Footer>
           <FooterText>Уже есть аккаунт?</FooterText>
