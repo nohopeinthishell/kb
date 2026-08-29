@@ -109,8 +109,6 @@ export const SignUpPage = () => {
   )
 }
 
-export const initSignUpPage = async () => Promise.resolve()
-
 const Page = styled.main`
   min-height: 100%;
 

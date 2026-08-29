@@ -1,1 +1,1 @@
-export { initSignInPage, SignInPage } from './SignIn'
+export { SignInPage } from './SignIn'
