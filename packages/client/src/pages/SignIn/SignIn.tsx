@@ -8,6 +8,7 @@ import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
 import FormUI, { FormError } from '../../ui/FormUI'
+import { ROUTES } from '../../constants/routes'
 
 export const SignInPage = () => {
   const navigate = useNavigate()
@@ -69,7 +70,7 @@ export const SignInPage = () => {
         </FormButton>
         <Footer>
           <FooterText>Ещё нет аккаунта?</FooterText>
-          <FormLink to="/sign-up">Зарегистрироваться</FormLink>
+          <FormLink to={ROUTES.signUp}>Зарегистрироваться</FormLink>
         </Footer>
       </FormUI>
     </Page>

@@ -9,6 +9,7 @@ export interface ThemeColors {
     surfaceMuted: string
     surfaceElevated: string
     overlay: string
+    imageScrim: string
   }
   text: {
     primary: string
@@ -30,7 +31,9 @@ export interface ThemeColors {
     primaryActive: string
     primaryText: string
     secondary: string
+    secondaryText: string
     secondaryHover: string
+    secondaryActive: string
     disabled: string
     disabledText: string
   }
@@ -75,6 +78,8 @@ export const darkTheme: AppTheme = {
       surfaceMuted: '#292927',
       surfaceElevated: '#31312f',
       overlay: 'rgba(0, 0, 0, 0.64)',
+      imageScrim:
+        'linear-gradient(rgba(18, 17, 15, 0.55), rgba(18, 17, 15, 0.82))',
     },
     text: {
       primary: '#f1ede5',
@@ -96,7 +101,9 @@ export const darkTheme: AppTheme = {
       primaryActive: '#5843ad',
       primaryText: '#ffffff',
       secondary: '#292927',
+      secondaryText: '#f1ede5',
       secondaryHover: '#353532',
+      secondaryActive: '#20201e',
       disabled: '#3a3936',
       disabledText: '#777169',
     },
@@ -115,8 +122,8 @@ export const darkTheme: AppTheme = {
       reputationUp: '#91c84a',
       reputationDown: '#ef8d91',
       guestHappy: '#91c84a',
-      guestNeutral: '#aaa7a0',
-      guestUnhappy: '#ef8d91',
+      guestNeutral: '#F5E427',
+      guestUnhappy: '#EB1717',
       tableReady: '#c4c0b7',
       tableWorn: '#8a847a',
       tableBroken: '#ef8d91',
@@ -137,6 +144,8 @@ export const lightTheme: AppTheme = {
       surfaceMuted: '#eeece6',
       surfaceElevated: '#f8f7f3',
       overlay: 'rgba(28, 27, 25, 0.4)',
+      imageScrim:
+        'radial-gradient(120% 90% at 50% 45%, rgba(244, 241, 234, 0.84), rgba(244, 241, 234, 0.52) 55%, rgba(244, 241, 234, 0.34))',
     },
     text: {
       primary: '#24221f',
@@ -158,7 +167,9 @@ export const lightTheme: AppTheme = {
       primaryActive: '#402f87',
       primaryText: '#ffffff',
       secondary: '#eeece6',
+      secondaryText: '#24221f',
       secondaryHover: '#e1ddd4',
+      secondaryActive: '#d3cec3',
       disabled: '#dedad1',
       disabledText: '#989187',
     },

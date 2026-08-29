@@ -1,7 +1,22 @@
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
-const LinkUI = styled(Link)`
+type Variant = 'primary' | 'secondary'
+
+const secondaryStyles = css`
+  color: ${({ theme }) => theme.colors.action.secondaryText};
+  background: ${({ theme }) => theme.colors.action.secondary};
+  @media (hover: hover) {
+    &:hover {
+      background: ${({ theme }) => theme.colors.action.secondaryHover};
+    }
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.action.secondaryActive};
+  }
+`
+
+const LinkUI = styled(Link)<{ $variant?: Variant }>`
   min-height: 56px;
   padding: 0 28px;
 
@@ -36,6 +51,8 @@ const LinkUI = styled(Link)`
     outline: 3px solid ${({ theme }) => theme.colors.border.focus};
     outline-offset: 4px;
   }
+
+  ${({ $variant }) => $variant === 'secondary' && secondaryStyles};
 `
 
 export default LinkUI

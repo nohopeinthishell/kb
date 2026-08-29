@@ -136,8 +136,13 @@ game/
 // переход недели: событие, гости, доход, репутация, износ
 function tick(state: GameState, choice: ChoiceId | null): GameState
 
-// действие игрока внутри недели: ремонт, помощник, провизия
-function applyAction(state: GameState, action: ActionId): GameState
+type GameAction =
+  | { type: 'repairTable' }
+  | { type: 'hireHelper' }
+  | { type: 'buyProvision' }
+
+// действие игрока внутри недели: ремонт стола, помощник, провизия
+function applyAction(state: GameState, action: GameAction): GameState
 
 // прогноз для кнопки «Следующая неделя»: «доход ~380, расходы ~290»
 function forecast(state: GameState): { income: number; expenses: number }
@@ -151,10 +156,15 @@ function forecast(state: GameState): { income: number; expenses: number }
 на кнопке считается по тем же формулам, что и `tick`. Если посчитать его в компоненте,
 формула окажется в двух местах и разъедется на первой же правке баланса.
 
+Ремонт запускается одной кнопкой без выбора цели на canvas. UI передаёт в `applyAction`
+только действие `repairTable`. `core` сначала ищет сломанный стол, затем изношенный,
+проверяет деньги и переводит найденный стол в исправное состояние. Если ремонтировать
+нечего, `core` возвращает ошибку. Правило доступности ремонта не дублируется в React.
+
 Аналогия для тех, кто пришёл с бэкенда: `core` — это доменный слой. Он не знает,
 кто его вызвал: HTTP, очередь или тест.
 
-**`render/` — отрисовка.** Тоже одна функция:
+**`render/` — отрисовка.** Основная функция:
 
 ```ts
 function render(ctx: CanvasRenderingContext2D, state: GameState, theme: Theme): void
@@ -162,6 +172,9 @@ function render(ctx: CanvasRenderingContext2D, state: GameState, theme: Theme): 
 
 Получает состояние и рисует его на холсте. Правил игры не знает — не решает, сколько
 гостей придёт, только рисует тех, кто уже есть в состоянии.
+
+Canvas только отображает состояние таверны. Для ремонта ему не нужны обработчики клика
+или hit-test: выбор повреждённого стола полностью выполняется в `core`.
 
 Постоянного игрового цикла нет: перерисовываем, когда изменилось состояние.
 `requestAnimationFrame` включается только на время анимации перехода недели.

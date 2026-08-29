@@ -1,0 +1,10 @@
+# Git хранит текст с LF и выдаёт LF в рабочую копию на всех ОС,
+# чтобы дифф не заполнялся переносами строк. Согласовано с .editorconfig.
+* text=auto eol=lf
+
+# Бинарники не трогать: любая нормализация их портит
+*.webp binary
+*.jpg  binary
+*.png  binary
+*.mp3  binary
+*.ttf  binary
