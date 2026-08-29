@@ -19,17 +19,21 @@ const secondaryStyles = css`
 const LinkUI = styled(Link)<{ $variant?: Variant }>`
   min-height: 56px;
   padding: 0 28px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border-radius: 12px;
-  color: ${({ theme }) => theme.colors.action.primaryText};
+
   background: ${({ theme }) => theme.colors.action.primary};
+  border-radius: 12px;
+
+  color: ${({ theme }) => theme.colors.action.primaryText};
   font-size: 18px;
   font-weight: 500;
   line-height: 1;
-  transition: background-color 160ms ease, transform 160ms ease;
+
+  transition: background-color 0.3s, transform 0.3s;
 
   @media (hover: hover) {
     &:hover {

@@ -4,6 +4,8 @@ import { initMainPage, MainPage } from './pages/Main'
 import { initNotFoundPage, NotFoundPage } from './pages/NotFound'
 import { ROUTES } from './constants/routes'
 import { GameScreen } from './game/ui'
+import { SignInPage } from './pages/SignIn'
+import { SignUpPage } from './pages/SignUp'
 
 export type PageInitContext = {
   clientToken?: string
@@ -20,6 +22,14 @@ export const routes = [
     path: ROUTES.main,
     Component: MainPage,
     fetchData: initMainPage,
+  },
+  {
+    path: ROUTES.signIn,
+    Component: SignInPage,
+  },
+  {
+    path: ROUTES.signUp,
+    Component: SignUpPage,
   },
   {
     path: '*',
