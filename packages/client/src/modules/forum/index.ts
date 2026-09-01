@@ -5,3 +5,4 @@ export {
   fetchTopic,
   fetchTopics,
 } from './api/topics'
+export { TopicList } from './ui/TopicList'
