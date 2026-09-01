@@ -66,7 +66,7 @@ export const SignInPage = () => {
         </Fields>
         {error && <FormError role="alert">{error}</FormError>}
         <FormButton type="submit" disabled={isLoading}>
-          Войти
+          {isLoading ? 'Входим…' : 'Войти'}
         </FormButton>
         <Footer>
           <FooterText>Ещё нет аккаунта?</FooterText>
