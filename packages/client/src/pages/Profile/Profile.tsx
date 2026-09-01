@@ -3,8 +3,8 @@ import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { ApiError, getCurrentUser, logout, updateProfile } from '../../api'
 import type { User } from '../../api'
+import { ApiError, getCurrentUser, logout, updateProfile } from '../../api'
 import { ROUTES } from '../../constants/routes'
 import { usePage } from '../../hooks/usePage'
 import {
@@ -15,6 +15,7 @@ import {
   ProfileAvatar,
   SecondaryButton,
 } from '../../modules/profile'
+import type { PageInitArgs } from '../../routes'
 import {
   clearProfile,
   selectProfile,
@@ -24,7 +25,6 @@ import {
 import { useDispatch, useSelector } from '../../store'
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
-import type { PageInitArgs } from '../../routes'
 
 type EditableUserField = keyof Pick<
   User,
@@ -59,7 +59,16 @@ export const ProfilePage = () => {
   const [isSaved, setIsSaved] = useState(false)
 
   useEffect(() => {
-    if (storedUser) setUser(storedUser)
+    if (!storedUser) return
+
+    setUser(current =>
+      current.id === 0
+        ? storedUser
+        : {
+            ...current,
+            avatar: storedUser.avatar,
+          }
+    )
   }, [storedUser])
 
   useEffect(() => {
@@ -120,6 +129,14 @@ export const ProfilePage = () => {
       setRequestError(getErrorMessage(error))
       setIsLoggingOut(false)
     }
+  }
+
+  function handleAvatarUpdated(updated: User) {
+    dispatch(setProfile(updated))
+    setUser(current => ({
+      ...current,
+      avatar: updated.avatar,
+    }))
   }
 
   const initials = `${user.first_name.charAt(0)}${user.second_name.charAt(0)}`
@@ -264,7 +281,7 @@ export const ProfilePage = () => {
         <AvatarEditor
           initials={initials}
           onClose={() => setActiveModal(null)}
-          onUpdated={updated => dispatch(setProfile(updated))}
+          onUpdated={handleAvatarUpdated}
         />
       )}
       {activeModal === 'password' && (

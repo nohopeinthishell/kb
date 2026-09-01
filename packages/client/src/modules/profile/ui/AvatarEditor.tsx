@@ -23,6 +23,8 @@ export const AvatarEditor = ({
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  const MAX_AVATAR_SIZE = 1024 * 1024
+
   useEffect(
     () => () => {
       if (preview) URL.revokeObjectURL(preview)
@@ -33,6 +35,14 @@ export const AvatarEditor = ({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
     if (!selectedFile) return
+
+    if (selectedFile.size > MAX_AVATAR_SIZE) {
+      setFile(null)
+      setPreview(null)
+      setError('Размер файла не должен превышать 1 МБ')
+      event.target.value = ''
+      return
+    }
 
     if (preview) URL.revokeObjectURL(preview)
     setFile(selectedFile)
@@ -58,7 +68,7 @@ export const AvatarEditor = ({
   return (
     <ProfileModal
       title="Смена аватара"
-      description="Загрузите изображение в формате JPG, PNG или WebP."
+      description="Загрузите изображение в формате JPG, PNG или WebP размером до 1МБ."
       onClose={onClose}>
       <Upload>
         <Avatar>
