@@ -6,6 +6,7 @@ import { ROUTES } from './constants/routes'
 import { GameScreen } from './game/ui'
 import { SignInPage } from './pages/SignIn'
 import { SignUpPage } from './pages/SignUp'
+import { ForumPage, initForumPage } from './pages/Forum'
 
 export type PageInitContext = {
   clientToken?: string
@@ -39,5 +40,10 @@ export const routes = [
   {
     path: ROUTES.game,
     Component: GameScreen,
+  },
+  {
+    path: ROUTES.forum.root,
+    Component: ForumPage,
+    fetchData: initForumPage,
   },
 ]
