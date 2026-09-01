@@ -33,7 +33,7 @@ export const MainPage = () => (
               </LinkUI>
             </li>
             <li>
-              <LinkUI to={ROUTES.forum} $variant="secondary">
+              <LinkUI to={ROUTES.forum.root} $variant="secondary">
                 Форум
               </LinkUI>
             </li>
