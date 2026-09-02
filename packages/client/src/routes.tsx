@@ -8,6 +8,7 @@ import { SignInPage } from './pages/SignIn'
 import { SignUpPage } from './pages/SignUp'
 import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
+import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
 
 export type PageInitContext = {
   clientToken?: string
@@ -51,5 +52,10 @@ export const routes = [
     path: ROUTES.forum.topic,
     Component: TopicPage,
     fetchData: initTopicPage,
+  },
+  {
+    path: ROUTES.forum.create,
+    Component: NewTopicPage,
+    fetchData: initNewTopicPage,
   },
 ]
