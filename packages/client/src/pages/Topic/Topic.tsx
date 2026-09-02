@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { formatDate, getTopic } from '../../modules/forum'
 import { ROUTES } from '../../constants/routes'
 import { NotFoundPage } from '../NotFound'
+import { TopicComments } from '../../modules/forum'
 
 export const TopicPage = () => {
   const { topicId } = useParams()
@@ -34,7 +35,7 @@ export const TopicPage = () => {
         </Meta>
       </Header>
 
-      {/* Комментарии */}
+      <TopicComments key={topic.id} topic={topic} />
     </Page>
   )
 }
