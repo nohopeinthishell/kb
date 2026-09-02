@@ -31,7 +31,6 @@ export const TopicPage = () => {
         <Meta>
           <span>{topic.authorLogin}</span>
           <time dateTime={topic.createdAt}>{formatDate(topic.createdAt)}</time>
-          <span>Ответов: {topic.comments.length}</span>
         </Meta>
       </Header>
 

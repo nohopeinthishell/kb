@@ -4,25 +4,37 @@ import styled from 'styled-components'
 import FormButton from '../../../ui/FormButton'
 
 type Props = {
-  onSubmit: (text: string) => void
+  onSubmit: (text: string) => Promise<void>
+  error: string | null
 }
 
-export const CommentForm = ({ onSubmit }: Props) => {
+export const CommentForm = ({ error, onSubmit }: Props) => {
   const [text, setText] = useState('')
   // useId даёт идентификатор, одинаковый на сервере и в браузере: обычный
   // счётчик или Math.random() разошлись бы при гидрации.
-  const fieldId = `comment-${useId()}`
+  const id = useId()
+  const fieldId = `${id}-comment`
+  const errorId = `${id}-error`
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setIsSubmitting(true)
+
     const value = text.trim()
 
     if (!value) {
+      setIsSubmitting(false)
       return
     }
 
-    onSubmit(value)
-    setText('')
+    try {
+      await onSubmit(value)
+      setText('')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -33,11 +45,18 @@ export const CommentForm = ({ onSubmit }: Props) => {
         id={fieldId}
         rows={4}
         value={text}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
         placeholder="Что скажешь?"
         onChange={event => setText(event.target.value)}
       />
+      {error && (
+        <Error id={errorId} role="alert">
+          {error}
+        </Error>
+      )}
 
-      <FormButton disabled={!text.trim()}>Добавить</FormButton>
+      <FormButton disabled={!text.trim() || isSubmitting}>Добавить</FormButton>
     </Form>
   )
 }
@@ -88,4 +107,10 @@ const Textarea = styled.textarea`
     border-color: ${({ theme }) => theme.colors.border.focus};
     outline: none;
   }
+`
+
+const Error = styled.span`
+  color: ${({ theme }) => theme.colors.feedback.danger};
+  font-size: 13px;
+  line-height: 1.4;
 `
