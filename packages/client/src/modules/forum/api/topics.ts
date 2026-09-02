@@ -76,13 +76,10 @@ const topics: Topic[] = [
 let nextTopicId = 6
 let nextCommentId = 105
 
-export const fetchTopics = (): Promise<Topic[]> => Promise.resolve(topics)
+export const getTopics = (): Topic[] => topics
 
-export const fetchTopic = (id: number): Promise<Topic | null> => {
-  const stored = topics.find(topic => topic.id === id)
-
-  return Promise.resolve(stored ?? null)
-}
+export const getTopic = (id: number): Topic | null =>
+  topics.find(topic => topic.id === id) ?? null
 
 export const createTopic = (title: string): Promise<Topic> => {
   const stored: Topic = {
