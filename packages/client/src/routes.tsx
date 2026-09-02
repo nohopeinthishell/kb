@@ -7,6 +7,7 @@ import { GameScreen } from './game/ui'
 import { SignInPage } from './pages/SignIn'
 import { SignUpPage } from './pages/SignUp'
 import { ForumPage, initForumPage } from './pages/Forum'
+import { TopicPage, initTopicPage } from './pages/Topic'
 
 export type PageInitContext = {
   clientToken?: string
@@ -45,5 +46,10 @@ export const routes = [
     path: ROUTES.forum.root,
     Component: ForumPage,
     fetchData: initForumPage,
+  },
+  {
+    path: ROUTES.forum.topic,
+    Component: TopicPage,
+    fetchData: initTopicPage,
   },
 ]
