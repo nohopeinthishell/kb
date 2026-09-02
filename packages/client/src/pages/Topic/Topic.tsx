@@ -1,11 +1,12 @@
 import { Helmet } from 'react-helmet-async'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { formatDate, getTopic } from '../../modules/forum'
 import { ROUTES } from '../../constants/routes'
 import { NotFoundPage } from '../NotFound'
 import { TopicComments } from '../../modules/forum'
+import BackLink from '../../ui/BackLink'
 
 export const TopicPage = () => {
   const { topicId } = useParams()
@@ -47,26 +48,6 @@ const Page = styled.main`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-`
-
-const BackLink = styled(Link)`
-  align-self: start;
-
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 14px;
-  text-decoration: none;
-
-  @media (hover: hover) {
-    &:hover {
-      color: ${({ theme }) => theme.colors.text.link};
-    }
-  }
-
-  &:focus-visible {
-    outline: 3px solid ${({ theme }) => theme.colors.border.focus};
-    outline-offset: 3px;
-    border-radius: 4px;
-  }
 `
 
 const Header = styled.header`

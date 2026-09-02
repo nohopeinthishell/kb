@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { getTopics, TopicList } from '../../modules/forum'
 import LinkUI from '../../ui/LinkUI'
 import { ROUTES } from '../../constants/routes'
+import BackLink from '../../ui/BackLink'
 
 export const ForumPage = () => {
   const topics = getTopics()
@@ -14,8 +15,13 @@ export const ForumPage = () => {
       </Helmet>
 
       <Title>Форум</Title>
-      <LinkUI to={ROUTES.forum.create}>Новая тема</LinkUI>
+      <BackLink to={ROUTES.main}>
+        <span aria-hidden="true">←</span> На главную
+      </BackLink>
+
       <TopicList topics={topics} />
+
+      <LinkUI to={ROUTES.forum.create}>Новая тема</LinkUI>
     </Page>
   )
 }

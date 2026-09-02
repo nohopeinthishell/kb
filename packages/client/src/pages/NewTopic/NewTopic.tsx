@@ -3,9 +3,10 @@ import { Helmet } from 'react-helmet-async'
 import { ROUTES, topicPath } from '../../constants/routes'
 import FormField from '../../ui/FormField'
 import { type FormEvent, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { createTopic } from '../../modules/forum'
 import FormButton from '../../ui/FormButton'
+import BackLink from '../../ui/BackLink'
 
 export const NewTopicPage = () => {
   const [title, setTitle] = useState('')
@@ -80,26 +81,6 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`
-
-const BackLink = styled(Link)`
-  align-self: start;
-
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 14px;
-  text-decoration: none;
-
-  @media (hover: hover) {
-    &:hover {
-      color: ${({ theme }) => theme.colors.text.link};
-    }
-  }
-
-  &:focus-visible {
-    outline: 3px solid ${({ theme }) => theme.colors.border.focus};
-    outline-offset: 3px;
-    border-radius: 4px;
-  }
 `
 
 export const initNewTopicPage = async () => Promise.resolve()
