@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { topicPath } from '../../../constants/routes'
 import { Topic } from '../types'
+import { formatTopicDate } from '../lib/formatDate'
 
 type Props = {
   topic: Topic
@@ -16,7 +17,7 @@ export const TopicRow = ({ topic }: Props) => (
 
     <Meta>
       <span>{topic.authorLogin}</span>
-      <time dateTime={topic.createdAt}>{topic.createdAt}</time>
+      <time dateTime={topic.createdAt}>{formatTopicDate(topic.createdAt)}</time>
       <span>Ответов: {topic.comments.length}</span>
     </Meta>
   </Row>
