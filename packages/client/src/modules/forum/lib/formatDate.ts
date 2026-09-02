@@ -1,4 +1,4 @@
-﻿// Экземпляр форматтера создаётся один раз на модуль: Intl.DateTimeFormat
+// Экземпляр форматтера создаётся один раз на модуль: Intl.DateTimeFormat
 // дорогой в конструировании, а в списке он вызывается на каждую строку.
 const dateFormat = new Intl.DateTimeFormat('ru-RU', {
   day: 'numeric',
@@ -9,4 +9,4 @@ const dateFormat = new Intl.DateTimeFormat('ru-RU', {
   timeZone: 'Europe/Moscow',
 })
 
-export const formatTopicDate = (iso: string) => dateFormat.format(new Date(iso))
+export const formatDate = (iso: string) => dateFormat.format(new Date(iso))

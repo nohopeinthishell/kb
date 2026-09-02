@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { formatTopicDate, getTopic } from '../../modules/forum'
+import { formatDate, getTopic } from '../../modules/forum'
 import { ROUTES } from '../../constants/routes'
 import { NotFoundPage } from '../NotFound'
 
@@ -29,9 +29,7 @@ export const TopicPage = () => {
         <Title>{topic.title}</Title>
         <Meta>
           <span>{topic.authorLogin}</span>
-          <time dateTime={topic.createdAt}>
-            {formatTopicDate(topic.createdAt)}
-          </time>
+          <time dateTime={topic.createdAt}>{formatDate(topic.createdAt)}</time>
           <span>Ответов: {topic.comments.length}</span>
         </Meta>
       </Header>

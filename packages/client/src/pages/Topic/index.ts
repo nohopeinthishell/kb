@@ -1,1 +1,1 @@
-﻿export { TopicPage, initTopicPage } from './Topic'
+export { TopicPage, initTopicPage } from './Topic'
