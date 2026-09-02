@@ -1,12 +1,15 @@
+import type { User } from '../../api'
+import type { PageInitArgs } from '../../routes'
+
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import type { User } from '../../api'
-import { ApiError, getCurrentUser, logout, updateProfile } from '../../api'
+import { ApiError, logout, updateProfile } from '../../api'
 import { ROUTES } from '../../constants/routes'
 import { usePage } from '../../hooks/usePage'
+
 import {
   AvatarEditor,
   AvatarImage,
@@ -15,14 +18,17 @@ import {
   ProfileAvatar,
   SecondaryButton,
 } from '../../modules/profile'
-import type { PageInitArgs } from '../../routes'
+
+import { initAuth } from '../../modules/auth'
+
 import {
-  clearProfile,
-  selectProfile,
-  setProfile,
-  setProfileError,
-} from '../../slices/profileSlice'
+  clearUser,
+  selectUser,
+  setUser as setStoredUser,
+} from '../../slices/userSlice'
+
 import { useDispatch, useSelector } from '../../store'
+
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 
@@ -30,6 +36,7 @@ type EditableUserField = keyof Pick<
   User,
   'first_name' | 'second_name' | 'display_name' | 'phone' | 'login' | 'email'
 >
+
 type ModalName = 'avatar' | 'password' | null
 
 const emptyUser: User = {
@@ -49,7 +56,7 @@ export const ProfilePage = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const storedUser = useSelector(selectProfile)
+  const storedUser = useSelector(selectUser)
 
   const [user, setUser] = useState<User>(storedUser ?? emptyUser)
   const [activeModal, setActiveModal] = useState<ModalName>(null)
@@ -108,7 +115,7 @@ export const ProfilePage = () => {
         phone: user.phone,
       })
 
-      dispatch(setProfile(updated))
+      dispatch(setStoredUser(updated))
       setIsSaved(true)
     } catch (error) {
       setRequestError(getErrorMessage(error))
@@ -123,7 +130,7 @@ export const ProfilePage = () => {
 
     try {
       await logout()
-      dispatch(clearProfile())
+      dispatch(clearUser())
       navigate(ROUTES.signIn)
     } catch (error) {
       setRequestError(getErrorMessage(error))
@@ -132,7 +139,7 @@ export const ProfilePage = () => {
   }
 
   function handleAvatarUpdated(updated: User) {
-    dispatch(setProfile(updated))
+    dispatch(setStoredUser(updated))
     setUser(current => ({
       ...current,
       avatar: updated.avatar,
@@ -291,19 +298,8 @@ export const ProfilePage = () => {
   )
 }
 
-export const initProfilePage = async ({
-  dispatch,
-  state,
-  ctx,
-}: PageInitArgs) => {
-  if (selectProfile(state)) return
-
-  try {
-    dispatch(setProfile(await getCurrentUser(ctx.cookie)))
-  } catch (error) {
-    dispatch(setProfileError(getErrorMessage(error)))
-  }
-}
+export const initProfilePage = async ({ dispatch, state, ctx }: PageInitArgs) =>
+  initAuth({ dispatch, state, ctx })
 
 const getErrorMessage = (error: unknown) =>
   error instanceof ApiError ? error.message : 'Не удалось связаться с сервером'

@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import { Helmet } from 'react-helmet-async'
 import LinkUI from '../../ui/LinkUI'
 import { ROUTES } from '../../constants/routes'
+import { initAuth } from '../../modules/auth'
+import type { PageInitArgs } from '../../routes'
 // Vite отдаёт из импорта картинки готовый URL, а не сам файл
 import tavernBg from './tavern.webp'
 
@@ -120,4 +122,4 @@ const MenuList = styled.ul`
   }
 `
 
-export const initMainPage = async () => Promise.resolve()
+export const initMainPage = async (args: PageInitArgs) => initAuth(args)

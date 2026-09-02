@@ -1,46 +1,53 @@
-import { FormEvent, useState } from 'react'
-import styled from 'styled-components'
+import type { PageInitArgs } from '../../routes'
 
+import { FormEvent } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
-import { ApiError, signUp } from '../../api'
+import styled from 'styled-components'
+
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
 import FormUI, { FormError } from '../../ui/FormUI'
+
 import { ROUTES } from '../../constants/routes'
+import { initAuth } from '../../modules/auth'
+import {
+  register,
+  selectAuthLoading,
+  selectUserError,
+} from '../../slices/userSlice'
+import { useDispatch, useSelector } from '../../store'
 
 export const SignUpPage = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const isLoading = useSelector(selectAuthLoading)
+  const error = useSelector(selectUserError)
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
 
-    setIsLoading(true)
-    setError(null)
+    try {
+      await dispatch(
+        register({
+          first_name: String(data.get('first_name') ?? ''),
+          second_name: String(data.get('second_name') ?? ''),
+          email: String(data.get('email') ?? ''),
+          phone: String(data.get('phone') ?? ''),
+          login: String(data.get('login') ?? ''),
+          password: String(data.get('password') ?? ''),
+        })
+      ).unwrap()
 
-    signUp({
-      first_name: String(data.get('first_name') ?? ''),
-      second_name: String(data.get('second_name') ?? ''),
-      email: String(data.get('email') ?? ''),
-      phone: String(data.get('phone') ?? ''),
-      login: String(data.get('login') ?? ''),
-      password: String(data.get('password') ?? ''),
-    })
-      .then(() => navigate('/'))
-      .catch((requestError: unknown) =>
-        setError(
-          requestError instanceof ApiError
-            ? requestError.message
-            : 'Не удалось связаться с сервером'
-        )
-      )
-      .finally(() => setIsLoading(false))
+      navigate(ROUTES.main, { replace: true })
+    } catch (error: unknown) {
+      // Ошибка отобразится на Redux слое
+      console.error(error)
+    }
   }
 
   return (
@@ -109,6 +116,8 @@ export const SignUpPage = () => {
     </Page>
   )
 }
+
+export const initSignUpPage = async (args: PageInitArgs) => initAuth(args)
 
 const Page = styled.main`
   min-height: 100%;

@@ -1,42 +1,50 @@
-import { FormEvent, useState } from 'react'
+import type { PageInitArgs } from '../../routes'
+
+import { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import styled from 'styled-components'
 
-import { Helmet } from 'react-helmet-async'
-import { useNavigate } from 'react-router-dom'
-import { ApiError, signIn } from '../../api'
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
 import FormUI, { FormError } from '../../ui/FormUI'
+
 import { ROUTES } from '../../constants/routes'
+import { initAuth } from '../../modules/auth'
+import {
+  login,
+  selectAuthLoading,
+  selectUserError,
+} from '../../slices/userSlice'
+
+import { useDispatch, useSelector } from '../../store'
 
 export const SignInPage = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const isLoading = useSelector(selectAuthLoading)
+  const error = useSelector(selectUserError)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
 
-    setIsLoading(true)
-    setError(null)
+    try {
+      await dispatch(
+        login({
+          login: String(data.get('login') ?? ''),
+          password: String(data.get('password') ?? ''),
+        })
+      ).unwrap()
 
-    signIn({
-      login: String(data.get('login') ?? ''),
-      password: String(data.get('password') ?? ''),
-    })
-      .then(() => navigate('/'))
-      .catch((requestError: unknown) =>
-        setError(
-          requestError instanceof ApiError
-            ? requestError.message
-            : 'Не удалось связаться с сервером'
-        )
-      )
-      .finally(() => setIsLoading(false))
+      navigate(ROUTES.main, { replace: true })
+    } catch (error: unknown) {
+      // Ошибка отобразится в Redux слое
+      console.error(error)
+    }
   }
 
   return (
@@ -76,6 +84,8 @@ export const SignInPage = () => {
     </Page>
   )
 }
+
+export const initSignInPage = async (args: PageInitArgs) => initAuth(args)
 
 const Page = styled.main`
   min-height: 100%;
