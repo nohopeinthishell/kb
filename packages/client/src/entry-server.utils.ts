@@ -3,6 +3,7 @@ import { PageInitContext } from './routes'
 
 export const createContext = (req: ExpressRequest): PageInitContext => ({
   clientToken: req.cookies.token,
+  cookie: req.headers.cookie,
 })
 
 export const createUrl = (req: ExpressRequest) => {

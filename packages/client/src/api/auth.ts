@@ -38,13 +38,18 @@ export class ApiError extends Error {
 
 export async function request<TResponse>(
   path: string,
-  init?: RequestInit
+  init?: RequestInit,
+  cookie?: string
 ): Promise<TResponse> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     credentials: 'include',
     headers: {
-      ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(init?.body &&
+      !(typeof FormData !== 'undefined' && init.body instanceof FormData)
+        ? { 'Content-Type': 'application/json' }
+        : {}),
+      ...(cookie ? { Cookie: cookie } : {}),
       ...init?.headers,
     },
   })
@@ -65,8 +70,8 @@ export async function request<TResponse>(
   return response.json() as Promise<TResponse>
 }
 
-export function getCurrentUser() {
-  return request<User>('/auth/user')
+export function getCurrentUser(cookie?: string) {
+  return request<User>('/auth/user', undefined, cookie)
 }
 
 export async function signIn(data: SignInRequest) {
@@ -81,4 +86,8 @@ export async function signUp(data: SignUpRequest) {
     method: 'POST',
     body: JSON.stringify(data),
   })
+}
+
+export function logout() {
+  return request('/auth/logout', { method: 'POST' })
 }
