@@ -16,8 +16,9 @@ export const TopicComments = ({ topic }: Props) => {
     try {
       const comment = await createComment(topic.id, text)
       setComments(prev => [...prev, comment])
-    } catch {
+    } catch (e) {
       setError('Не удалось оставить комментарий')
+      throw e
     }
   }
 

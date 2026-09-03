@@ -32,6 +32,9 @@ export const CommentForm = ({ error, onSubmit }: Props) => {
     try {
       await onSubmit(value)
       setText('')
+    } catch {
+      // текст ошибки уже показал родитель через проп error —
+      // здесь просто гасим, чтобы не было unhandled rejection
     } finally {
       setIsSubmitting(false)
     }
