@@ -10,7 +10,6 @@ import { routes } from './routes'
 import { GlobalStyle, theme } from './theme'
 import './assets/css/index.css'
 import ErrorBoundary from './components/ErrorBoundary'
-import Bomb from './components/ErrorBoundary/Bomb' // ВРЕМЕННО
 
 const router = createBrowserRouter(routes)
 
@@ -21,7 +20,6 @@ ReactDOM.hydrateRoot(
       <GlobalStyle />
       <Provider store={store}>
         <ErrorBoundary>
-          <Bomb />
           <RouterProvider router={router} />
         </ErrorBoundary>
       </Provider>
