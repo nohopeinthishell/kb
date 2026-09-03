@@ -26,7 +26,9 @@ const initialState: UserState = {
   error: null,
 }
 
-export const checkAuth = createAsyncThunk('user/checkAuth', getCurrentUser)
+export const checkAuth = createAsyncThunk('user/checkAuth', () =>
+  getCurrentUser()
+)
 
 export const login = createAsyncThunk(
   'user/login',
@@ -67,6 +69,9 @@ const userSlice = createSlice({
     },
     setUserError: (state, { payload }: PayloadAction<string>) => {
       state.error = payload
+    },
+    clearUserError: state => {
+      state.error = null
     },
     clearUser: state => {
       state.user = null
@@ -119,6 +124,7 @@ export const selectIsAuthChecked = (state: RootState) =>
 export const selectAuthLoading = (state: RootState) => state.user.isLoading
 export const selectUserError = (state: RootState) => state.user.error
 
-export const { clearUser, setUser, setUserError } = userSlice.actions
+export const { clearUser, clearUserError, setUser, setUserError } =
+  userSlice.actions
 
 export default userSlice.reducer

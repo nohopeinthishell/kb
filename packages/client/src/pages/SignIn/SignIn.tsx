@@ -1,6 +1,6 @@
 import type { PageInitArgs } from '../../routes'
 
-import { FormEvent } from 'react'
+import { FormEvent, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import styled from 'styled-components'
@@ -13,6 +13,7 @@ import FormUI, { FormError } from '../../ui/FormUI'
 import { ROUTES } from '../../constants/routes'
 import { initAuth } from '../../modules/auth'
 import {
+  clearUserError,
   login,
   selectAuthLoading,
   selectUserError,
@@ -26,6 +27,10 @@ export const SignInPage = () => {
 
   const isLoading = useSelector(selectAuthLoading)
   const error = useSelector(selectUserError)
+
+  useEffect(() => {
+    dispatch(clearUserError())
+  }, [dispatch])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
