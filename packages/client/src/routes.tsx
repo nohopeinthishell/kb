@@ -7,6 +7,7 @@ import { GameScreen } from './game/ui'
 import { SignInPage } from './pages/SignIn'
 import { SignUpPage } from './pages/SignUp'
 import { initProfilePage, ProfilePage } from './pages/Profile'
+import { ServerError } from './pages/ServerError'
 
 export type PageInitContext = {
   clientToken?: string
@@ -37,6 +38,10 @@ export const routes = [
     path: ROUTES.profile,
     Component: ProfilePage,
     fetchData: initProfilePage,
+  },
+  {
+    path: ROUTES.serverError,
+    Component: ServerError,
   },
   {
     path: '*',
