@@ -297,7 +297,28 @@ cookie → тема из БД (если вошли) → светлая по ум
 
 Пошагово, потому что из-за SSR это не совсем очевидно.
 
-**1.** Создать `pages/ForumPage.tsx` и экспортировать компонент:
+**0.** Добавить путь в `constants/routes.ts`. Пути одной фичи группируются
+во вложенный объект, а рядом лежат функции-построители URL:
+
+```ts
+export const ROUTES = {
+  forum: {
+    root: '/forum',
+    create: '/forum/new',
+    topic: '/forum/:topicId', // паттерн для routes.tsx
+  },
+} as const
+
+// готовый адрес для <Link> и navigate(): подставлять значение в паттерн
+// роутер не умеет
+export const topicPath = (topicId: number) => `/forum/${topicId}`
+```
+
+`ROUTES` остаётся справочником «ключ → строка пути», построители живут
+отдельными экспортами.
+
+**1.** Создать `pages/Forum/Forum.tsx` (папка на страницу + `index.ts`
+с реэкспортом) и экспортировать компонент:
 
 ```tsx
 export const ForumPage = () => {
@@ -336,16 +357,33 @@ export const initForumPage = async ({ dispatch, state }: PageInitArgs) => {
 ```
 modules/forum/
   ui/
-    TopicList.tsx
-    TopicRow.tsx
+    TopicList.tsx      список тем
+    TopicRow.tsx       строка списка — наружу не экспортируется
     CommentForm.tsx
   api/
-    topics.ts
-  index.ts        export { TopicList } from './ui/TopicList'
+    topics.ts          запросы к своему бэкенду
+  lib/
+    formatDate.ts      утилиты модуля: форматирование, преобразования
+  types.ts             типы ответов API: Topic, Comment
+  index.ts             фасад: что видно снаружи
 ```
 
-Страница `pages/ForumPage.tsx` импортирует только `modules/forum`, ничего изнутри.
+Страница `pages/Forum/Forum.tsx` импортирует только `modules/forum`, ничего изнутри.
 Слайс лежит в `slices/forumSlice.ts`, запросы — в `modules/forum/api/`.
+
+Что где лежит:
+
+- **`types.ts`** — формы JSON-ответов сервера. Даты в них строки (`createdAt: string`),
+  а не `Date`: JSON дат не знает, и всё, что попадает в стор, обязано пережить
+  сериализацию в `window.APP_INITIAL_STATE`.
+- **`lib/`** — утилиты самого модуля. Не путать с корневым `lib/`: там лежат свои
+  структуры данных (очередь, стек, сортировка) по требованию курса.
+- **`index.ts`** — экспортируется только то, чем пользуются снаружи. `TopicList` — да,
+  `TopicRow` — нет: он нужен своему списку и больше никому.
+
+Внутри модуля файлы импортируют друг друга напрямую (`./TopicRow`, `../lib/formatDate`).
+Правило «только через `index.ts`» действует на границе модуля, а не внутри него —
+импорт из собственного фасада создал бы цикл.
 
 ---
 
