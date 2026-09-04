@@ -74,5 +74,3 @@ const ReturnLink = styled(LinkUI)`
     width: 100%;
   }
 `
-
-export const initServerErrorPage = async () => Promise.resolve()
