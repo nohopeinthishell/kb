@@ -1,1 +1,1 @@
-export { initServerErrorPage, ServerError } from './ServerError'
+export { ServerError } from './ServerError'

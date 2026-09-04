@@ -63,7 +63,11 @@ export const routes = [
   },
   {
     path: ROUTES.serverError,
-    Component: ServerError,
+    element: (
+      <ProtectedRoute>
+        <ServerError />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '*',
