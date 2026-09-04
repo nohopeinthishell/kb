@@ -13,10 +13,13 @@ type EventCardData = {
 
 type EventCardProps = {
   event: EventCardData | null
+  phase: 'none' | 'pending' | 'resolved'
   onChoice: (choiceId: string) => void
 }
 
-const EventCard = ({ event, onChoice }: EventCardProps) => {
+const EventCard = ({ event, phase, onChoice }: EventCardProps) => {
+  if (phase === 'resolved') return null
+
   if (!event) {
     return (
       <Card aria-live="polite">
