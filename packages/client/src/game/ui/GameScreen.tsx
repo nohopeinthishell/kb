@@ -19,7 +19,7 @@ const GameScreen = () => {
 
   const currentEvent =
     EVENTS.find(event => event.id === state.currentEventId) ?? null
-  const hasPendingEvent = state.currentEventId !== null
+  const hasPendingEvent = state.eventPhase === 'pending'
   const isGameFinished = state.status !== 'playing'
 
   const handleEventChoice = (choiceId: string) => {
@@ -31,6 +31,8 @@ const GameScreen = () => {
       choiceId,
     })
   }
+
+  const isEveryTableNew = state.tavern.tables.every(t => t.condition === 'new')
 
   return (
     <Page>
@@ -44,27 +46,35 @@ const GameScreen = () => {
         <TavernCanvas state={state} />
       </CanvasFrame>
 
-      <EventCard event={currentEvent} onChoice={handleEventChoice} />
+      <EventCard
+        event={currentEvent}
+        phase={state.eventPhase}
+        onChoice={handleEventChoice}
+      />
 
       <Controls>
         <ActionButton
           type="button"
           onClick={() => handleApplyAction({ type: 'repairTable' })}
-          disabled={isGameFinished || hasPendingEvent}>
+          disabled={isGameFinished || hasPendingEvent || isEveryTableNew}>
           Починить стол
         </ActionButton>
 
         <ActionButton
           type="button"
           onClick={() => handleApplyAction({ type: 'hireHelper' })}
-          disabled={isGameFinished || hasPendingEvent}>
+          disabled={
+            isGameFinished || hasPendingEvent || state.tavern.helperActive
+          }>
           Нанять помощника
         </ActionButton>
 
         <ActionButton
           type="button"
           onClick={() => handleApplyAction({ type: 'buyProvision' })}
-          disabled={isGameFinished || hasPendingEvent}>
+          disabled={
+            isGameFinished || hasPendingEvent || state.provisionWeeks > 0
+          }>
           Закупить провизию
         </ActionButton>
 
@@ -86,11 +96,14 @@ const GameScreen = () => {
 const Page = styled.main`
   box-sizing: border-box;
   width: min(100%, 1048px);
+  height: 100vh;
+  height: 100dvh;
   margin: 0 auto;
-  padding: 24px;
+  padding: clamp(8px, 2.5vh, 24px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: clamp(8px, 1.5vh, 16px);
+  overflow: hidden;
 `
 
 const StatusBar = styled.div`
@@ -106,8 +119,11 @@ const StatusBar = styled.div`
 `
 
 const CanvasFrame = styled.div`
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
   width: 100%;
+  background: ${({ theme }) => theme.colors.background.surface};
   border: 1px solid ${({ theme }) => theme.colors.border.default};
   border-radius: 12px;
 `

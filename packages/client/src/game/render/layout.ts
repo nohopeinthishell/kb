@@ -10,7 +10,7 @@ export const calculatePositionByIndex = (
   const isDown = index >= 2
   const chairIndex = index % 2
   const x = table.x + table.width * (chairIndex === 0 ? 0.3 : 0.7)
-  const y = isDown ? table.height + table.y + 30 : table.y - 30
+  const y = isDown ? table.height + table.y : table.y
 
   return { x, y }
 }
@@ -48,10 +48,10 @@ export const getColorByMood = (
 }
 
 const positions = [
-  { x: 1 / 4, y: 1 / 4 }, // top-left
-  { x: 3 / 4, y: 1 / 4 }, // top-right
-  { x: 1 / 4, y: 3 / 4 }, // bottom-left
-  { x: 3 / 4, y: 3 / 4 }, // bottom-right
+  { x: 0.32, y: 0.38 }, // top-left
+  { x: 0.68, y: 0.38 }, // top-right
+  { x: 0.32, y: 0.7 }, // bottom-left
+  { x: 0.68, y: 0.7 }, // bottom-right
 ]
 
 const TABLE_WIDTH = 200
@@ -63,7 +63,7 @@ export const calculateTableRects = (
   height: number,
   tables: TableState[]
 ): TableRect[] => {
-  return tables.map((table, idx) => {
+  return tables.map(table => {
     const { x, y } = positions[table.id - 1]
     const xPos = width * x - TABLE_WIDTH / 2
     const yPos = height * y - TABLE_HEIGHT / 2

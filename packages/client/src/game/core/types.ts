@@ -18,6 +18,7 @@ export type GameState = {
   lastActionError: ActionError | null
 
   currentEventId: string | null
+  eventPhase: 'none' | 'pending' | 'resolved'
 
   usedEventIds: string[]
 }
