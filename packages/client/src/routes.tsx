@@ -3,13 +3,14 @@ import { AppDispatch, RootState } from './store'
 import { initMainPage, MainPage } from './pages/Main'
 import { initNotFoundPage, NotFoundPage } from './pages/NotFound'
 import { ROUTES } from './constants/routes'
-import { GameScreen } from './game/ui'
-import { SignInPage } from './pages/SignIn'
-import { SignUpPage } from './pages/SignUp'
+import { GamePage, initGamePage } from './pages/Game'
+import { initSignInPage, SignInPage } from './pages/SignIn'
+import { initSignUpPage, SignUpPage } from './pages/SignUp'
 import { initProfilePage, ProfilePage } from './pages/Profile'
 import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
+import { ProtectedRoute, PublicOnlyRoute } from './modules/auth'
 
 export type PageInitContext = {
   clientToken?: string
@@ -25,44 +26,83 @@ export type PageInitArgs = {
 export const routes = [
   {
     path: ROUTES.main,
-    Component: MainPage,
+    element: (
+      <ProtectedRoute>
+        <MainPage />
+      </ProtectedRoute>
+    ),
     fetchData: initMainPage,
   },
   {
     path: ROUTES.signIn,
-    Component: SignInPage,
+    element: (
+      <PublicOnlyRoute>
+        <SignInPage />
+      </PublicOnlyRoute>
+    ),
+    fetchData: initSignInPage,
   },
   {
     path: ROUTES.signUp,
-    Component: SignUpPage,
+    element: (
+      <PublicOnlyRoute>
+        <SignUpPage />
+      </PublicOnlyRoute>
+    ),
+    fetchData: initSignUpPage,
   },
   {
     path: ROUTES.profile,
-    Component: ProfilePage,
+    element: (
+      <ProtectedRoute>
+        <ProfilePage />
+      </ProtectedRoute>
+    ),
     fetchData: initProfilePage,
   },
   {
     path: '*',
-    Component: NotFoundPage,
+    element: (
+      <ProtectedRoute>
+        <NotFoundPage />
+      </ProtectedRoute>
+    ),
     fetchData: initNotFoundPage,
   },
   {
     path: ROUTES.game,
-    Component: GameScreen,
+    element: (
+      <ProtectedRoute>
+        <GamePage />
+      </ProtectedRoute>
+    ),
+    fetchData: initGamePage,
   },
   {
     path: ROUTES.forum.root,
-    Component: ForumPage,
+    Component: (
+      <ProtectedRoute>
+        <ForumPage />
+      </ProtectedRoute>
+    ),
     fetchData: initForumPage,
   },
   {
     path: ROUTES.forum.topic,
-    Component: TopicPage,
+    Component: (
+      <ProtectedRoute>
+        <TopicPage />
+      </ProtectedRoute>
+    ),
     fetchData: initTopicPage,
   },
   {
     path: ROUTES.forum.create,
-    Component: NewTopicPage,
+    Component: (
+      <ProtectedRoute>
+        <NewTopicPage />
+      </ProtectedRoute>
+    ),
     fetchData: initNewTopicPage,
   },
 ]

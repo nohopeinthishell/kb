@@ -1,8 +1,12 @@
+import type { PageInitArgs } from '../../routes'
+
 import { Helmet } from 'react-helmet-async'
 import styled from 'styled-components'
 
-import LinkUI from '../../ui/LinkUI'
 import notFoundDoor from './img/not-found-404.png'
+
+import LinkUI from '../../ui/LinkUI'
+import { initAuth } from '../../modules/auth'
 
 export const NotFoundPage = () => {
   return (
@@ -76,4 +80,4 @@ const ReturnLink = styled(LinkUI)`
   }
 `
 
-export const initNotFoundPage = async () => Promise.resolve()
+export const initNotFoundPage = async (args: PageInitArgs) => initAuth(args)
