@@ -9,6 +9,7 @@ import { store } from './store'
 import { routes } from './routes'
 import { GlobalStyle, theme } from './theme'
 import './assets/css/index.css'
+import ErrorBoundary from './components/ErrorBoundary'
 
 const router = createBrowserRouter(routes)
 
@@ -18,7 +19,9 @@ ReactDOM.hydrateRoot(
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Provider store={store}>
-        <RouterProvider router={router} />
+        <ErrorBoundary>
+          <RouterProvider router={router} />
+        </ErrorBoundary>
       </Provider>
     </ThemeProvider>
   </HelmetProvider>

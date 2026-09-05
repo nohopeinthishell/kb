@@ -7,6 +7,9 @@ import { GamePage, initGamePage } from './pages/Game'
 import { initSignInPage, SignInPage } from './pages/SignIn'
 import { initSignUpPage, SignUpPage } from './pages/SignUp'
 import { initProfilePage, ProfilePage } from './pages/Profile'
+import { ForumPage, initForumPage } from './pages/Forum'
+import { TopicPage, initTopicPage } from './pages/Topic'
+import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
 import { ProtectedRoute, PublicOnlyRoute } from './modules/auth'
 
 export type PageInitContext = {
@@ -74,5 +77,32 @@ export const routes = [
       </ProtectedRoute>
     ),
     fetchData: initGamePage,
+  },
+  {
+    path: ROUTES.forum.root,
+    Component: (
+      <ProtectedRoute>
+        <ForumPage />
+      </ProtectedRoute>
+    ),
+    fetchData: initForumPage,
+  },
+  {
+    path: ROUTES.forum.topic,
+    Component: (
+      <ProtectedRoute>
+        <TopicPage />
+      </ProtectedRoute>
+    ),
+    fetchData: initTopicPage,
+  },
+  {
+    path: ROUTES.forum.create,
+    Component: (
+      <ProtectedRoute>
+        <NewTopicPage />
+      </ProtectedRoute>
+    ),
+    fetchData: initNewTopicPage,
   },
 ]

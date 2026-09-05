@@ -22,6 +22,7 @@ import { routes } from './routes'
 import { GlobalStyle, theme } from './theme'
 import './assets/css/index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
+import ErrorBoundary from './components/ErrorBoundary'
 
 export const render = async (req: ExpressRequest) => {
   const { query, dataRoutes } = createStaticHandler(routes)
@@ -73,7 +74,9 @@ export const render = async (req: ExpressRequest) => {
           <ThemeProvider theme={theme}>
             <GlobalStyle />
             <Provider store={store}>
-              <StaticRouterProvider router={router} context={context} />
+              <ErrorBoundary>
+                <StaticRouterProvider router={router} context={context} />
+              </ErrorBoundary>
             </Provider>
           </ThemeProvider>
         </HelmetProvider>
