@@ -17,6 +17,12 @@ type UserState = {
   isAuthChecked: boolean
   isLoading: boolean
   error: string | null
+  authCheckError: string | null
+}
+
+type CheckAuthRejectValue = {
+  message: string
+  statusCode?: number
 }
 
 const initialState: UserState = {
@@ -24,11 +30,32 @@ const initialState: UserState = {
   isAuthChecked: false,
   isLoading: false,
   error: null,
+  authCheckError: null,
 }
 
-export const checkAuth = createAsyncThunk('user/checkAuth', () =>
-  getCurrentUser()
-)
+export const checkAuth = createAsyncThunk<
+  User,
+  void,
+  { rejectValue: CheckAuthRejectValue }
+>('user/checkAuth', async (_, { rejectWithValue }) => {
+  try {
+    return await getCurrentUser()
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return rejectWithValue({
+        message: error.message,
+        statusCode: error.statusCode,
+      })
+    }
+
+    return rejectWithValue({
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Не удалось проверить авторизацию',
+    })
+  }
+})
 
 export const login = createAsyncThunk(
   'user/login',
@@ -66,6 +93,7 @@ const userSlice = createSlice({
       state.user = payload
       state.isAuthChecked = true
       state.error = null
+      state.authCheckError = null
     },
     setUserError: (state, { payload }: PayloadAction<string>) => {
       state.error = payload
@@ -77,6 +105,7 @@ const userSlice = createSlice({
       state.user = null
       state.isAuthChecked = true
       state.error = null
+      state.authCheckError = null
     },
   },
   extraReducers: builder => {
@@ -84,10 +113,21 @@ const userSlice = createSlice({
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.user = action.payload
         state.isAuthChecked = true
+        state.authCheckError = null
       })
-      .addCase(checkAuth.rejected, state => {
-        state.user = null
-        state.isAuthChecked = true
+      .addCase(checkAuth.rejected, (state, action) => {
+        if (action.payload?.statusCode === 401) {
+          state.user = null
+          state.isAuthChecked = true
+          state.authCheckError = null
+          return
+        }
+
+        state.isAuthChecked = false
+        state.authCheckError =
+          action.payload?.message ??
+          action.error.message ??
+          'Не удалось проверить авторизацию'
       })
       .addCase(login.pending, state => {
         state.isLoading = true
@@ -97,6 +137,7 @@ const userSlice = createSlice({
         state.user = action.payload
         state.isAuthChecked = true
         state.isLoading = false
+        state.authCheckError = null
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false
@@ -110,6 +151,7 @@ const userSlice = createSlice({
         state.user = action.payload
         state.isAuthChecked = true
         state.isLoading = false
+        state.authCheckError = null
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false
@@ -123,6 +165,8 @@ export const selectIsAuthChecked = (state: RootState) =>
   state.user.isAuthChecked
 export const selectAuthLoading = (state: RootState) => state.user.isLoading
 export const selectUserError = (state: RootState) => state.user.error
+export const selectAuthCheckError = (state: RootState) =>
+  state.user.authCheckError
 
 export const { clearUser, clearUserError, setUser, setUserError } =
   userSlice.actions

@@ -4,14 +4,20 @@ import { Navigate } from 'react-router-dom'
 
 import { ROUTES } from '../../../constants/routes'
 import { useAuth } from '../../../hooks/useAuth'
+import { AuthCheckFailure } from './AuthCheckFailure'
 
 export const PublicOnlyRoute = ({ children }: PropsWithChildren) => {
-  const { isAuthChecked, isAuthenticated } = useAuth()
+  const { authCheckError, isAuthChecked, isAuthenticated, retryAuthCheck } =
+    useAuth()
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  if (authCheckError) {
+    return <AuthCheckFailure onRetry={retryAuthCheck} />
+  }
 
   if (!isAuthChecked) {
     return null

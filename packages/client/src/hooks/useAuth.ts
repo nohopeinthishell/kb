@@ -1,22 +1,30 @@
 import { useEffect } from 'react'
 
-import { checkAuth, selectIsAuthChecked, selectUser } from '../slices/userSlice'
+import {
+  checkAuth,
+  selectAuthCheckError,
+  selectIsAuthChecked,
+  selectUser,
+} from '../slices/userSlice'
 import { useDispatch, useSelector } from '../store'
 
 export const useAuth = () => {
   const dispatch = useDispatch()
   const user = useSelector(selectUser)
   const isAuthChecked = useSelector(selectIsAuthChecked)
+  const authCheckError = useSelector(selectAuthCheckError)
 
   useEffect(() => {
-    if (!isAuthChecked) {
+    if (!isAuthChecked && !authCheckError) {
       void dispatch(checkAuth())
     }
-  }, [dispatch, isAuthChecked])
+  }, [authCheckError, dispatch, isAuthChecked])
 
   return {
     user,
     isAuthChecked,
+    authCheckError,
     isAuthenticated: Boolean(user),
+    retryAuthCheck: () => void dispatch(checkAuth()),
   }
 }
