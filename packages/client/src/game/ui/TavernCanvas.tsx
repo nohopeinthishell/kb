@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { drawTavern } from '../render'
 import styled, { useTheme } from 'styled-components'
 import type { GameState } from '../core'
@@ -7,10 +7,13 @@ type TavernCanvasProps = {
   state: GameState
 }
 
+import { useSprites } from '../../hooks/useSprites'
+
 const LOGICAL_WIDTH = 1000
 const LOGICAL_HEIGHT = 800
 
 const TavernCanvas = ({ state }: TavernCanvasProps) => {
+  const { sprites, error, isLoading } = useSprites()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const theme = useTheme()
 
@@ -32,16 +35,24 @@ const TavernCanvas = ({ state }: TavernCanvasProps) => {
       const context = canvas.getContext('2d')
       if (!context) return
 
+      if (!sprites) return
+
+      const scale = Math.min(width / LOGICAL_WIDTH, height / LOGICAL_HEIGHT)
+      const offsetX = (width - LOGICAL_WIDTH * scale) / 2
+      const offsetY = (height - LOGICAL_HEIGHT * scale) / 2
+
+      context.setTransform(1, 0, 0, 1, 0, 0)
+      context.clearRect(0, 0, canvas.width, canvas.height)
       context.setTransform(
-        (width / LOGICAL_WIDTH) * pixelRatio,
+        scale * pixelRatio,
         0,
         0,
-        (height / LOGICAL_HEIGHT) * pixelRatio,
-        0,
-        0
+        scale * pixelRatio,
+        offsetX * pixelRatio,
+        offsetY * pixelRatio
       )
 
-      drawTavern(context, theme, state, LOGICAL_WIDTH, LOGICAL_HEIGHT)
+      drawTavern(context, theme, state, sprites, LOGICAL_WIDTH, LOGICAL_HEIGHT)
     }
 
     draw()
@@ -50,7 +61,7 @@ const TavernCanvas = ({ state }: TavernCanvasProps) => {
     resizeObserver.observe(canvas)
 
     return () => resizeObserver.disconnect()
-  }, [theme, state])
+  }, [theme, state, sprites])
 
   return (
     <Canvas ref={canvasRef} width={LOGICAL_WIDTH} height={LOGICAL_HEIGHT} />
@@ -60,7 +71,7 @@ const TavernCanvas = ({ state }: TavernCanvasProps) => {
 const Canvas = styled.canvas`
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   background: ${({ theme }) => theme.colors.background.surface};
 `
 

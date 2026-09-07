@@ -132,6 +132,7 @@ export const applyAction = (
         reputation,
         status: changedFields.money < 0 ? 'lost' : state.status,
         currentEventId: null,
+        eventPhase: 'resolved',
         lastActionError: null,
       }
     }

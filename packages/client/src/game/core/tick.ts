@@ -66,6 +66,7 @@ export const tick = (state: GameState): GameState => {
     provisionWeeks: state.provisionWeeks > 0 ? state.provisionWeeks - 1 : 0,
     lastActionError: null,
     currentEventId: null,
+    eventPhase: 'none',
     tavern: {
       ...state.tavern,
       tables: tableDegradation.tables,
@@ -95,6 +96,7 @@ export const tick = (state: GameState): GameState => {
     ...stateAfterWeek,
     seed: selectedEvent.nextSeed,
     currentEventId: selectedEvent.eventId,
+    eventPhase: selectedEvent.eventId ? 'pending' : 'none',
     usedEventIds: selectedEvent.eventId
       ? [...stateAfterWeek.usedEventIds, selectedEvent.eventId]
       : stateAfterWeek.usedEventIds,
