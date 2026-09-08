@@ -11,6 +11,7 @@ import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
 import { ProtectedRoute, PublicOnlyRoute } from './modules/auth'
+import { ServerError } from './pages/ServerError'
 
 export type PageInitContext = {
   clientToken?: string
@@ -59,6 +60,14 @@ export const routes = [
       </ProtectedRoute>
     ),
     fetchData: initProfilePage,
+  },
+  {
+    path: ROUTES.serverError,
+    element: (
+      <ProtectedRoute>
+        <ServerError />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '*',
