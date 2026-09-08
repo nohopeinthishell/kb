@@ -2,13 +2,15 @@ import { Helmet } from 'react-helmet-async'
 import styled from 'styled-components'
 
 import { ROUTES } from '../../constants/routes'
+import { initAuth } from '../../modules/auth'
+import type { PageInitArgs } from '../../routes'
 import LinkUI from '../../ui/LinkUI'
 
-const weekSteps = [
+const WEEK_STEPS = [
   {
     number: '1',
     title: 'Разберитесь с событием',
-    text: 'Каждую неделю в таверне что-то происходит. Выберите один из вариантов и сразу увидите цену решения.',
+    text: 'В начале недели в таверне может что-то произойти. Выберите один из вариантов и сразу увидите цену решения.',
   },
   {
     number: '2',
@@ -60,7 +62,7 @@ export const StartGamePage = () => (
       <RulesSection aria-labelledby="week-rules-title">
         <SectionTitle id="week-rules-title">Как проходит неделя</SectionTitle>
         <StepList>
-          {weekSteps.map(step => (
+          {WEEK_STEPS.map(step => (
             <Step key={step.number}>
               <StepNumber aria-hidden="true">{step.number}</StepNumber>
               <StepText>
@@ -347,4 +349,4 @@ const StartLink = styled(LinkUI)`
 
 const BackLink = styled(LinkUI)``
 
-export const initStartGamePage = async () => Promise.resolve()
+export const initStartGamePage = async (args: PageInitArgs) => initAuth(args)
