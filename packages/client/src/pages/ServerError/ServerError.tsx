@@ -3,6 +3,8 @@ import styled from 'styled-components'
 
 import LinkUI from '../../ui/LinkUI'
 import serverError from './img/server-error-500.png'
+import { PageInitArgs } from '../../routes'
+import { initAuth } from '../../modules/auth'
 
 export const ServerError = () => {
   return (
@@ -74,3 +76,4 @@ const ReturnLink = styled(LinkUI)`
     width: 100%;
   }
 `
+export const initServerErrorPage = async (args: PageInitArgs) => initAuth(args)
