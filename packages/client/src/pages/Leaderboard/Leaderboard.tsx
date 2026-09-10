@@ -8,7 +8,14 @@ import { ROUTES } from '../../constants/routes'
 import { usePage } from '../../hooks/usePage'
 import { initAuth } from '../../modules/auth'
 
+import { calculateScore } from '../../game/core'
+
 import { MOCK_LEADERBOARD_RECORDS } from './mockRecords'
+
+const recordsWithScore = MOCK_LEADERBOARD_RECORDS.map(record => ({
+  ...record,
+  score: calculateScore(record.money, record.reputation),
+})).sort((left, right) => right.score - left.score)
 
 export const LeaderboardPage = () => {
   usePage({ initPage: initLeaderboardPage })
@@ -37,7 +44,7 @@ export const LeaderboardPage = () => {
             <div>
               <SectionTitle>Таблица рекордов</SectionTitle>
               <SectionDescription>
-                Сравните казну, репутацию и исход партии с другими трактирщиками
+                Итоговый счёт считается из казны и репутации после шести недель
               </SectionDescription>
             </div>
           </SectionHeader>
@@ -47,26 +54,18 @@ export const LeaderboardPage = () => {
                 <tr>
                   <HeaderCell>#</HeaderCell>
                   <HeaderCell>Игрок</HeaderCell>
-                  <HeaderCell>Исход</HeaderCell>
-                  <HeaderCell>Казна</HeaderCell>
-                  <HeaderCell>Репутация</HeaderCell>
+                  <HeaderCell>Счёт</HeaderCell>
                 </tr>
               </thead>
               <tbody>
-                {MOCK_LEADERBOARD_RECORDS.map((record, index) => (
+                {recordsWithScore.map((record, index) => (
                   <tr key={record.id}>
                     <Cell>{index + 1}</Cell>
                     <Cell>{record.name}</Cell>
                     <Cell>
-                      <HighlightValue>
-                        {record.isWin ? 'Победа' : 'Поражение'}
-                      </HighlightValue>
-                    </Cell>
-                    <Cell>
-                      <HighlightValue>{record.money} зол.</HighlightValue>
-                    </Cell>
-                    <Cell>
-                      <HighlightValue>{record.reputation}</HighlightValue>
+                      <ScoreValue $isLost={record.money < 0}>
+                        {record.score}
+                      </ScoreValue>
                     </Cell>
                   </tr>
                 ))}
@@ -79,11 +78,7 @@ export const LeaderboardPage = () => {
   )
 }
 
-export const initLeaderboardPage = async ({
-  dispatch,
-  state,
-  ctx,
-}: PageInitArgs) => initAuth({ dispatch, state, ctx })
+export const initLeaderboardPage = async (args: PageInitArgs) => initAuth(args)
 
 const Page = styled.main`
   min-height: 100%;
@@ -196,7 +191,8 @@ const Cell = styled.td`
   }
 `
 
-const HighlightValue = styled.span`
-  color: ${({ theme }) => theme.colors.feedback.success};
+const ScoreValue = styled.span<{ $isLost: boolean }>`
+  color: ${({ theme, $isLost }) =>
+    $isLost ? theme.colors.feedback.danger : theme.colors.text.primary};
   font-weight: 600;
 `
