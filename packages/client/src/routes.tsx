@@ -7,6 +7,7 @@ import { GamePage, initGamePage } from './pages/Game'
 import { initSignInPage, SignInPage } from './pages/SignIn'
 import { initSignUpPage, SignUpPage } from './pages/SignUp'
 import { initProfilePage, ProfilePage } from './pages/Profile'
+import { initLeaderboardPage, LeaderboardPage } from './pages/Leaderboard'
 import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
@@ -61,6 +62,15 @@ export const routes = [
       </ProtectedRoute>
     ),
     fetchData: initProfilePage,
+  },
+  {
+    path: ROUTES.leaderboard,
+    element: (
+      <ProtectedRoute>
+        <LeaderboardPage />
+      </ProtectedRoute>
+    ),
+    fetchData: initLeaderboardPage,
   },
   {
     path: ROUTES.serverError,
