@@ -4,7 +4,7 @@ import {
   createGuests,
   degradeTable,
 } from './actions'
-import { checkEventConditions, EVENTS, selectRandomEvent } from './events'
+import { applyRandomEventSelection } from './events'
 import { calculateWeek, getGuestsByReputation } from './forecast'
 import { GameState } from './types'
 
@@ -84,21 +84,5 @@ export const tick = (state: GameState): GameState => {
     return { ...stateAfterWeek, status: 'won' }
   }
 
-  const availableEvents = EVENTS.filter(
-    event =>
-      !stateAfterWeek.usedEventIds.includes(event.id) &&
-      event.selection === 'random' &&
-      checkEventConditions(event.conditions, stateAfterWeek)
-  )
-  const selectedEvent = selectRandomEvent(stateAfterWeek.seed, availableEvents)
-
-  return {
-    ...stateAfterWeek,
-    seed: selectedEvent.nextSeed,
-    currentEventId: selectedEvent.eventId,
-    eventPhase: selectedEvent.eventId ? 'pending' : 'none',
-    usedEventIds: selectedEvent.eventId
-      ? [...stateAfterWeek.usedEventIds, selectedEvent.eventId]
-      : stateAfterWeek.usedEventIds,
-  }
+  return applyRandomEventSelection(stateAfterWeek)
 }

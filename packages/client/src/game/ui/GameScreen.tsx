@@ -1,20 +1,14 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
-import {
-  applyAction,
-  createNewGameState,
-  GameAction,
-  initialGameState,
-  tick,
-} from '../core'
+import { applyAction, createNewGameState, GameAction, tick } from '../core'
 import { EVENTS } from '../core/events'
 import EventCard from './EventCard'
 import GameOverScreen from './GameOverScreen'
 import TavernCanvas from './TavernCanvas'
 
 const GameScreen = () => {
-  const [state, setState] = useState(initialGameState)
+  const [state, setState] = useState(createNewGameState)
 
   const handlePlayAgain = () => {
     setState(createNewGameState())
