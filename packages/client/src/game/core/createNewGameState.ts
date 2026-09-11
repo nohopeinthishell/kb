@@ -4,10 +4,13 @@ import { resolveWeek } from './tick'
 import { GameState } from './types'
 
 export const createNewGameState = (): GameState => {
-  const started = resolveWeek({
-    ...initialGameState,
-    seed: Math.floor(Math.random() * 2147483646) + 1,
-  })
+  const started = resolveWeek(
+    {
+      ...initialGameState,
+      seed: Math.floor(Math.random() * 2147483646) + 1,
+    },
+    { degradeTables: false }
+  )
 
   return applyRandomEventSelection({
     ...started,

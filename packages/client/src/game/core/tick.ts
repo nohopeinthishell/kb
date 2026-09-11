@@ -8,13 +8,20 @@ import { applyRandomEventSelection } from './events'
 import { calculateWeek, getGuestsByReputation } from './forecast'
 import { GameState } from './types'
 
-export const resolveWeek = (state: GameState): GameState => {
+type ResolveWeekOptions = {
+  degradeTables?: boolean
+}
+
+export const resolveWeek = (
+  state: GameState,
+  options: ResolveWeekOptions = {}
+): GameState => {
+  const degradeTables = options.degradeTables ?? true
   const expectedGuestCount = getGuestsByReputation(state.reputation)
   const randomGuests = calculateRandomGuests(state.seed, expectedGuestCount)
-  const tableDegradation = degradeTable(
-    randomGuests.nextSeed,
-    state.tavern.tables
-  )
+  const tableDegradation = degradeTables
+    ? degradeTable(randomGuests.nextSeed, state.tavern.tables)
+    : { tables: state.tavern.tables, nextSeed: randomGuests.nextSeed }
 
   const stateWithDegradedTables: GameState = {
     ...state,
