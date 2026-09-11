@@ -8,13 +8,7 @@ import { applyRandomEventSelection } from './events'
 import { calculateWeek, getGuestsByReputation } from './forecast'
 import { GameState } from './types'
 
-export const tick = (state: GameState): GameState => {
-  if (state.status !== 'playing') return state
-
-  if (state.currentEventId !== null) {
-    return { ...state, lastActionError: 'EVENT_CHOICE_REQUIRED' }
-  }
-
+export const resolveWeek = (state: GameState): GameState => {
   const expectedGuestCount = getGuestsByReputation(state.reputation)
   const randomGuests = calculateRandomGuests(state.seed, expectedGuestCount)
   const tableDegradation = degradeTable(
@@ -56,17 +50,14 @@ export const tick = (state: GameState): GameState => {
     Math.max(0, state.reputation + reputationDelta)
   )
 
-  const isFinalWeek = state.week >= 6
-  const stateAfterWeek: GameState = {
+  const money = state.money + income - expenses
+
+  return {
     ...state,
-    money: state.money + income - expenses,
+    money,
     reputation,
     seed: tableDegradation.nextSeed,
-    week: isFinalWeek ? 6 : state.week + 1,
-    provisionWeeks: state.provisionWeeks > 0 ? state.provisionWeeks - 1 : 0,
     lastActionError: null,
-    currentEventId: null,
-    eventPhase: 'none',
     tavern: {
       ...state.tavern,
       tables: tableDegradation.tables,
@@ -74,6 +65,25 @@ export const tick = (state: GameState): GameState => {
       queueSize,
       helperActive: false,
     },
+    status: money < 0 ? 'lost' : state.status,
+  }
+}
+
+export const tick = (state: GameState): GameState => {
+  if (state.status !== 'playing') return state
+
+  if (state.currentEventId !== null) {
+    return { ...state, lastActionError: 'EVENT_CHOICE_REQUIRED' }
+  }
+
+  const resolved = resolveWeek(state)
+  const isFinalWeek = state.week >= 6
+  const stateAfterWeek: GameState = {
+    ...resolved,
+    week: isFinalWeek ? 6 : state.week + 1,
+    provisionWeeks: state.provisionWeeks > 0 ? state.provisionWeeks - 1 : 0,
+    currentEventId: null,
+    eventPhase: 'none',
   }
 
   if (stateAfterWeek.money < 0) {
