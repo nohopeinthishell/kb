@@ -39,3 +39,23 @@ export const checkEventConditions = (
     }
   })
 }
+
+export const applyRandomEventSelection = (state: GameState): GameState => {
+  const availableEvents = EVENTS.filter(
+    event =>
+      !state.usedEventIds.includes(event.id) &&
+      event.selection === 'random' &&
+      checkEventConditions(event.conditions, state)
+  )
+  const selectedEvent = selectRandomEvent(state.seed, availableEvents)
+
+  return {
+    ...state,
+    seed: selectedEvent.nextSeed,
+    currentEventId: selectedEvent.eventId,
+    eventPhase: selectedEvent.eventId ? 'pending' : 'none',
+    usedEventIds: selectedEvent.eventId
+      ? [...state.usedEventIds, selectedEvent.eventId]
+      : state.usedEventIds,
+  }
+}

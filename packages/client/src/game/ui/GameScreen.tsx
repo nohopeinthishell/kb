@@ -1,13 +1,18 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
-import { applyAction, GameAction, initialGameState, tick } from '../core'
+import { applyAction, createNewGameState, GameAction, tick } from '../core'
 import { EVENTS } from '../core/events'
 import EventCard from './EventCard'
+import GameOverScreen from './GameOverScreen'
 import TavernCanvas from './TavernCanvas'
 
 const GameScreen = () => {
-  const [state, setState] = useState(initialGameState)
+  const [state, setState] = useState(createNewGameState)
+
+  const handlePlayAgain = () => {
+    setState(createNewGameState())
+  }
 
   const handleNextWeek = () => {
     setState(currentState => tick(currentState))
@@ -82,13 +87,18 @@ const GameScreen = () => {
           type="button"
           onClick={handleNextWeek}
           disabled={isGameFinished || hasPendingEvent}>
-          {state.status === 'playing'
-            ? 'Следующая неделя'
-            : state.status === 'won'
-            ? 'Победа'
-            : 'Поражение'}
+          Следующая неделя
         </NextWeekButton>
       </Controls>
+
+      {isGameFinished && (
+        <GameOverScreen
+          status={state.status}
+          money={state.money}
+          reputation={state.reputation}
+          onPlayAgain={handlePlayAgain}
+        />
+      )}
     </Page>
   )
 }

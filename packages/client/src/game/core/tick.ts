@@ -4,23 +4,24 @@ import {
   createGuests,
   degradeTable,
 } from './actions'
-import { checkEventConditions, EVENTS, selectRandomEvent } from './events'
+import { applyRandomEventSelection } from './events'
 import { calculateWeek, getGuestsByReputation } from './forecast'
 import { GameState } from './types'
 
-export const tick = (state: GameState): GameState => {
-  if (state.status !== 'playing') return state
+type ResolveWeekOptions = {
+  degradeTables?: boolean
+}
 
-  if (state.currentEventId !== null) {
-    return { ...state, lastActionError: 'EVENT_CHOICE_REQUIRED' }
-  }
-
+export const resolveWeek = (
+  state: GameState,
+  options: ResolveWeekOptions = {}
+): GameState => {
+  const degradeTables = options.degradeTables ?? true
   const expectedGuestCount = getGuestsByReputation(state.reputation)
   const randomGuests = calculateRandomGuests(state.seed, expectedGuestCount)
-  const tableDegradation = degradeTable(
-    randomGuests.nextSeed,
-    state.tavern.tables
-  )
+  const tableDegradation = degradeTables
+    ? degradeTable(randomGuests.nextSeed, state.tavern.tables)
+    : { tables: state.tavern.tables, nextSeed: randomGuests.nextSeed }
 
   const stateWithDegradedTables: GameState = {
     ...state,
@@ -56,17 +57,14 @@ export const tick = (state: GameState): GameState => {
     Math.max(0, state.reputation + reputationDelta)
   )
 
-  const isFinalWeek = state.week >= 6
-  const stateAfterWeek: GameState = {
+  const money = state.money + income - expenses
+
+  return {
     ...state,
-    money: state.money + income - expenses,
+    money,
     reputation,
     seed: tableDegradation.nextSeed,
-    week: isFinalWeek ? 6 : state.week + 1,
-    provisionWeeks: state.provisionWeeks > 0 ? state.provisionWeeks - 1 : 0,
     lastActionError: null,
-    currentEventId: null,
-    eventPhase: 'none',
     tavern: {
       ...state.tavern,
       tables: tableDegradation.tables,
@@ -74,6 +72,25 @@ export const tick = (state: GameState): GameState => {
       queueSize,
       helperActive: false,
     },
+    status: money < 0 ? 'lost' : state.status,
+  }
+}
+
+export const tick = (state: GameState): GameState => {
+  if (state.status !== 'playing') return state
+
+  if (state.currentEventId !== null) {
+    return { ...state, lastActionError: 'EVENT_CHOICE_REQUIRED' }
+  }
+
+  const resolved = resolveWeek(state)
+  const isFinalWeek = state.week >= 6
+  const stateAfterWeek: GameState = {
+    ...resolved,
+    week: isFinalWeek ? 6 : state.week + 1,
+    provisionWeeks: state.provisionWeeks > 0 ? state.provisionWeeks - 1 : 0,
+    currentEventId: null,
+    eventPhase: 'none',
   }
 
   if (stateAfterWeek.money < 0) {
@@ -84,21 +101,5 @@ export const tick = (state: GameState): GameState => {
     return { ...stateAfterWeek, status: 'won' }
   }
 
-  const availableEvents = EVENTS.filter(
-    event =>
-      !stateAfterWeek.usedEventIds.includes(event.id) &&
-      event.selection === 'random' &&
-      checkEventConditions(event.conditions, stateAfterWeek)
-  )
-  const selectedEvent = selectRandomEvent(stateAfterWeek.seed, availableEvents)
-
-  return {
-    ...stateAfterWeek,
-    seed: selectedEvent.nextSeed,
-    currentEventId: selectedEvent.eventId,
-    eventPhase: selectedEvent.eventId ? 'pending' : 'none',
-    usedEventIds: selectedEvent.eventId
-      ? [...stateAfterWeek.usedEventIds, selectedEvent.eventId]
-      : stateAfterWeek.usedEventIds,
-  }
+  return applyRandomEventSelection(stateAfterWeek)
 }
