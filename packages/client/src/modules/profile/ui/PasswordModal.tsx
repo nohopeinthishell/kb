@@ -2,16 +2,26 @@ import { FormEvent, useState } from 'react'
 import styled from 'styled-components'
 
 import { ApiError, changePassword } from '../../../api'
+import { useFormValidation } from '../../../hooks/useFormValidation'
 import FormButton from '../../../ui/FormButton'
 import FormField from '../../../ui/FormField'
+import { validatePassword } from '../../../utils/validation'
 import { SecondaryButton } from './ProfileButtons'
 import { ModalActions, ProfileModal } from './ProfileModal'
 
 type PasswordModalProps = { onClose: () => void }
 
+const passwordValidators = {
+  oldPassword: validatePassword,
+  newPassword: validatePassword,
+  newPasswordRepeat: validatePassword,
+}
+
 export const PasswordModal = ({ onClose }: PasswordModalProps) => {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { getFieldValidationProps, setFieldError, validateForm } =
+    useFormValidation(passwordValidators)
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -20,13 +30,24 @@ export const PasswordModal = ({ onClose }: PasswordModalProps) => {
     const newPassword = String(data.get('newPassword') ?? '')
     const repeatedPassword = String(data.get('newPasswordRepeat') ?? '')
 
+    setError(null)
+
+    if (
+      !validateForm({
+        oldPassword,
+        newPassword,
+        newPasswordRepeat: repeatedPassword,
+      })
+    ) {
+      return
+    }
+
     if (newPassword !== repeatedPassword) {
-      setError('Новые пароли не совпадают')
+      setFieldError('newPasswordRepeat', 'Новые пароли не совпадают')
       return
     }
 
     setIsLoading(true)
-    setError(null)
     try {
       await changePassword({ oldPassword, newPassword })
       onClose()
@@ -46,7 +67,7 @@ export const PasswordModal = ({ onClose }: PasswordModalProps) => {
       title="Смена пароля"
       description="Введите текущий пароль и придумайте новый."
       onClose={onClose}>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} noValidate>
         <Fields>
           <FormField
             label="Текущий пароль"
@@ -54,6 +75,7 @@ export const PasswordModal = ({ onClose }: PasswordModalProps) => {
             type="password"
             autoComplete="current-password"
             required
+            {...getFieldValidationProps('oldPassword')}
           />
           <FormField
             label="Новый пароль"
@@ -61,6 +83,7 @@ export const PasswordModal = ({ onClose }: PasswordModalProps) => {
             type="password"
             autoComplete="new-password"
             required
+            {...getFieldValidationProps('newPassword')}
           />
           <FormField
             label="Повторите новый пароль"
@@ -68,6 +91,7 @@ export const PasswordModal = ({ onClose }: PasswordModalProps) => {
             type="password"
             autoComplete="new-password"
             required
+            {...getFieldValidationProps('newPasswordRepeat')}
           />
         </Fields>
         {error && <ErrorMessage role="alert">{error}</ErrorMessage>}
