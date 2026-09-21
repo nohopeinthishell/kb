@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { applyAction, createNewGameState, GameAction, tick } from '../core'
@@ -9,6 +9,22 @@ import TavernCanvas from './TavernCanvas'
 
 const GameScreen = () => {
   const [state, setState] = useState(createNewGameState)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isFullscreenAvailable, setIsFullscreenAvailable] = useState(false)
+  const pageRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    setIsFullscreenAvailable(document.fullscreenEnabled)
+
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === pageRef.current)
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+
+    return () =>
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
 
   const handlePlayAgain = () => {
     setState(createNewGameState())
@@ -37,14 +53,36 @@ const GameScreen = () => {
     })
   }
 
+  const handleFullscreenToggle = async () => {
+    if (!pageRef.current || !document.fullscreenEnabled) return
+
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen()
+      } else {
+        await pageRef.current.requestFullscreen()
+      }
+    } catch (error) {
+      console.error('Не удалось изменить полноэкранный режим', error)
+    }
+  }
+
   const isEveryTableNew = state.tavern.tables.every(t => t.condition === 'new')
 
   return (
-    <Page>
+    <Page ref={pageRef}>
       <StatusBar>
         <span>Неделя: {state.week} из 6</span>
         <span>Казна: {state.money}</span>
         <span>Репутация: {state.reputation}</span>
+        {isFullscreenAvailable && (
+          <FullscreenButton
+            type="button"
+            aria-pressed={isFullscreen}
+            onClick={handleFullscreenToggle}>
+            {isFullscreen ? 'Выйти из полноэкранного режима' : 'На весь экран'}
+          </FullscreenButton>
+        )}
       </StatusBar>
 
       <CanvasFrame>
@@ -114,6 +152,12 @@ const Page = styled.main`
   flex-direction: column;
   gap: clamp(8px, 1.5vh, 16px);
   overflow: hidden;
+  background: ${({ theme }) => theme.colors.background.page};
+
+  &:fullscreen {
+    width: 100%;
+    max-width: none;
+  }
 `
 
 const StatusBar = styled.div`
@@ -126,6 +170,25 @@ const StatusBar = styled.div`
   background: ${({ theme }) => theme.colors.background.surfaceMuted};
   border: 1px solid ${({ theme }) => theme.colors.border.subtle};
   border-radius: 12px;
+`
+
+const FullscreenButton = styled.button`
+  padding: 6px 12px;
+  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.background.surfaceElevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.border.strong};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.border.focus};
+    outline-offset: 2px;
+  }
 `
 
 const CanvasFrame = styled.div`
