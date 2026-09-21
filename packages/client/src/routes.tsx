@@ -11,7 +11,11 @@ import { initLeaderboardPage, LeaderboardPage } from './pages/Leaderboard'
 import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
-import { ProtectedRoute, PublicOnlyRoute } from './modules/auth'
+import {
+  OAuthCallbackRoute,
+  ProtectedRoute,
+  PublicOnlyRoute,
+} from './modules/auth'
 import { initStartGamePage, StartGamePage } from './pages/StartGame'
 import { ServerError, initServerErrorPage } from './pages/ServerError'
 
@@ -30,9 +34,11 @@ export const routes = [
   {
     path: ROUTES.main,
     element: (
-      <ProtectedRoute>
-        <MainPage />
-      </ProtectedRoute>
+      <OAuthCallbackRoute>
+        <ProtectedRoute>
+          <MainPage />
+        </ProtectedRoute>
+      </OAuthCallbackRoute>
     ),
     fetchData: initMainPage,
   },

@@ -1,6 +1,6 @@
 import type { PageInitArgs } from '../../routes'
 
-import { FormEvent, useEffect } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import styled from 'styled-components'
@@ -10,7 +10,8 @@ import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
 import FormUI, { FormError } from '../../ui/FormUI'
 
-import { ROUTES } from '../../constants/routes'
+import { createYandexAuthorizeUrl, getYandexServiceId } from '../../api'
+import { getOAuthRedirectUri, ROUTES } from '../../constants/routes'
 import { initAuth } from '../../modules/auth'
 import {
   clearUserError,
@@ -27,6 +28,8 @@ export const SignInPage = () => {
 
   const isLoading = useSelector(selectAuthLoading)
   const error = useSelector(selectUserError)
+  const [isOAuthLoading, setIsOAuthLoading] = useState(false)
+  const [oauthError, setOAuthError] = useState<string | null>(null)
 
   useEffect(() => {
     dispatch(clearUserError())
@@ -49,6 +52,25 @@ export const SignInPage = () => {
     } catch (error: unknown) {
       // Ошибка отобразится в Redux слое
       console.error(error)
+    }
+  }
+
+  async function handleYandexSignIn() {
+    setIsOAuthLoading(true)
+    setOAuthError(null)
+
+    try {
+      const redirectUri = getOAuthRedirectUri(window.location.origin)
+      const { service_id: serviceId } = await getYandexServiceId(redirectUri)
+
+      window.location.href = createYandexAuthorizeUrl(serviceId, redirectUri)
+    } catch (requestError) {
+      setOAuthError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Не удалось начать вход через Яндекс'
+      )
+      setIsOAuthLoading(false)
     }
   }
 
@@ -77,10 +99,19 @@ export const SignInPage = () => {
             autoComplete="current-password"
           />
         </Fields>
-        {error && <FormError role="alert">{error}</FormError>}
-        <FormButton type="submit" disabled={isLoading}>
+        {(error || oauthError) && (
+          <FormError role="alert">{error || oauthError}</FormError>
+        )}
+        <FormButton type="submit" disabled={isLoading || isOAuthLoading}>
           {isLoading ? 'Входим…' : 'Войти'}
         </FormButton>
+        <Separator>или</Separator>
+        <OAuthButton
+          type="button"
+          disabled={isLoading || isOAuthLoading}
+          onClick={handleYandexSignIn}>
+          {isOAuthLoading ? 'Переходим в Яндекс…' : 'Войти через Яндекс'}
+        </OAuthButton>
         <Footer>
           <FooterText>Ещё нет аккаунта?</FooterText>
           <FormLink to={ROUTES.signUp}>Зарегистрироваться</FormLink>
@@ -121,4 +152,36 @@ const FooterText = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
   font: inherit;
   font-size: 16px;
+`
+
+const Separator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: ${({ theme }) => theme.colors.text.muted};
+  font-size: 14px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: ${({ theme }) => theme.colors.border.subtle};
+  }
+`
+
+const OAuthButton = styled(FormButton)`
+  color: ${({ theme }) => theme.colors.action.secondaryText};
+  background: ${({ theme }) => theme.colors.action.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: ${({ theme }) => theme.colors.action.secondaryHover};
+    }
+  }
+
+  &:active:not(:disabled) {
+    background: ${({ theme }) => theme.colors.action.secondaryActive};
+  }
 `
