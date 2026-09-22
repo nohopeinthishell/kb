@@ -22,7 +22,13 @@ export default function FormField({
   return (
     <Field>
       <Label htmlFor={fieldId}>{label}</Label>
-      <Input className={error && 'error'} {...inputProps} id={fieldId} />
+      <Input
+        className={error ? 'error' : undefined}
+        {...inputProps}
+        id={fieldId}
+        aria-invalid={error ? true : inputProps['aria-invalid']}
+        aria-describedby={error ? errorId : inputProps['aria-describedby']}
+      />
       {error && (
         <Error id={errorId} role="alert">
           {error}

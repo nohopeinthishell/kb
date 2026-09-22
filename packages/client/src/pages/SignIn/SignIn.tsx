@@ -12,6 +12,7 @@ import FormUI, { FormError } from '../../ui/FormUI'
 
 import { createYandexAuthorizeUrl, getYandexServiceId } from '../../api'
 import { getOAuthRedirectUri, ROUTES } from '../../constants/routes'
+import { useFormValidation } from '../../hooks/useFormValidation'
 import { initAuth } from '../../modules/auth'
 import {
   clearUserError,
@@ -21,6 +22,12 @@ import {
 } from '../../slices/userSlice'
 
 import { useDispatch, useSelector } from '../../store'
+import { validationRules } from '../../utils/validation'
+
+const signInValidators = {
+  login: validationRules.login,
+  password: validationRules.password,
+}
 
 export const SignInPage = () => {
   const dispatch = useDispatch()
@@ -30,6 +37,8 @@ export const SignInPage = () => {
   const error = useSelector(selectUserError)
   const [isOAuthLoading, setIsOAuthLoading] = useState(false)
   const [oauthError, setOAuthError] = useState<string | null>(null)
+  const { getFieldValidationProps, validateForm } =
+    useFormValidation(signInValidators)
 
   useEffect(() => {
     dispatch(clearUserError())
@@ -39,14 +48,15 @@ export const SignInPage = () => {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
+    const values = {
+      login: String(data.get('login') ?? ''),
+      password: String(data.get('password') ?? ''),
+    }
+
+    if (!validateForm(values)) return
 
     try {
-      await dispatch(
-        login({
-          login: String(data.get('login') ?? ''),
-          password: String(data.get('password') ?? ''),
-        })
-      ).unwrap()
+      await dispatch(login(values)).unwrap()
 
       navigate(ROUTES.main, { replace: true })
     } catch (error: unknown) {
@@ -90,6 +100,7 @@ export const SignInPage = () => {
             type="text"
             placeholder="Введите логин"
             autoComplete="username"
+            {...getFieldValidationProps('login')}
           />
           <FormField
             label="Пароль"
@@ -97,6 +108,7 @@ export const SignInPage = () => {
             type="password"
             placeholder="Введите пароль"
             autoComplete="current-password"
+            {...getFieldValidationProps('password')}
           />
         </Fields>
         {(error || oauthError) && (
