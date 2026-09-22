@@ -108,7 +108,7 @@ export const SignUpPage = () => {
             label="Телефон"
             name="phone"
             type="tel"
-            placeholder="+7 999 123-45-67"
+            placeholder="89991234567"
             autoComplete="tel"
             {...getFieldValidationProps('phone')}
           />

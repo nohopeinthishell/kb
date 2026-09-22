@@ -12,7 +12,6 @@ import { ModalActions, ProfileModal } from './ProfileModal'
 type PasswordModalProps = { onClose: () => void }
 
 const passwordValidators = {
-  oldPassword: validatePassword,
   newPassword: validatePassword,
   newPasswordRepeat: validatePassword,
 }
@@ -34,7 +33,6 @@ export const PasswordModal = ({ onClose }: PasswordModalProps) => {
 
     if (
       !validateForm({
-        oldPassword,
         newPassword,
         newPasswordRepeat: repeatedPassword,
       })
@@ -75,7 +73,6 @@ export const PasswordModal = ({ onClose }: PasswordModalProps) => {
             type="password"
             autoComplete="current-password"
             required
-            {...getFieldValidationProps('oldPassword')}
           />
           <FormField
             label="Новый пароль"
