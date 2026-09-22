@@ -8,6 +8,7 @@ import styled from 'styled-components'
 
 import { ApiError, logout, updateProfile } from '../../api'
 import { ROUTES } from '../../constants/routes'
+import { useFormValidation } from '../../hooks/useFormValidation'
 import { usePage } from '../../hooks/usePage'
 
 import {
@@ -31,6 +32,7 @@ import { useDispatch, useSelector } from '../../store'
 
 import FormButton from '../../ui/FormButton'
 import FormField from '../../ui/FormField'
+import { validationRules } from '../../utils/validation'
 
 type EditableUserField = keyof Pick<
   User,
@@ -38,6 +40,14 @@ type EditableUserField = keyof Pick<
 >
 
 type ModalName = 'avatar' | 'password' | null
+
+const profileValidators = {
+  first_name: validationRules.first_name,
+  second_name: validationRules.second_name,
+  login: validationRules.login,
+  email: validationRules.email,
+  phone: validationRules.phone,
+}
 
 const emptyUser: User = {
   id: 0,
@@ -64,6 +74,8 @@ export const ProfilePage = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const { getFieldValidationProps, validateForm } =
+    useFormValidation(profileValidators)
 
   useEffect(() => {
     if (!storedUser) return
@@ -100,6 +112,16 @@ export const ProfilePage = () => {
 
   async function handleProfileSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    const values = {
+      first_name: user.first_name,
+      second_name: user.second_name,
+      login: user.login,
+      email: user.email,
+      phone: user.phone,
+    }
+
+    if (!validateForm(values)) return
 
     setIsSaving(true)
     setIsSaved(false)
@@ -202,7 +224,7 @@ export const ProfilePage = () => {
                 </SectionDescription>
               </div>
             </SectionHeader>
-            <ProfileForm onSubmit={handleProfileSubmit}>
+            <ProfileForm onSubmit={handleProfileSubmit} noValidate>
               <FieldsGrid>
                 <FormField
                   label="Имя"
@@ -211,6 +233,7 @@ export const ProfilePage = () => {
                   onChange={handleFieldChange}
                   autoComplete="given-name"
                   required
+                  {...getFieldValidationProps('first_name')}
                 />
                 <FormField
                   label="Фамилия"
@@ -219,6 +242,7 @@ export const ProfilePage = () => {
                   onChange={handleFieldChange}
                   autoComplete="family-name"
                   required
+                  {...getFieldValidationProps('second_name')}
                 />
                 <WideField>
                   <FormField
@@ -236,6 +260,7 @@ export const ProfilePage = () => {
                   onChange={handleFieldChange}
                   autoComplete="username"
                   required
+                  {...getFieldValidationProps('login')}
                 />
                 <FormField
                   label="Почта"
@@ -245,6 +270,7 @@ export const ProfilePage = () => {
                   onChange={handleFieldChange}
                   autoComplete="email"
                   required
+                  {...getFieldValidationProps('email')}
                 />
                 <WideField>
                   <FormField
@@ -255,6 +281,7 @@ export const ProfilePage = () => {
                     onChange={handleFieldChange}
                     autoComplete="tel"
                     required
+                    {...getFieldValidationProps('phone')}
                   />
                 </WideField>
               </FieldsGrid>

@@ -11,6 +11,7 @@ import FormLink from '../../ui/FormLink'
 import FormUI, { FormError } from '../../ui/FormUI'
 
 import { ROUTES } from '../../constants/routes'
+import { useFormValidation } from '../../hooks/useFormValidation'
 import { initAuth } from '../../modules/auth'
 import {
   clearUserError,
@@ -19,6 +20,16 @@ import {
   selectUserError,
 } from '../../slices/userSlice'
 import { useDispatch, useSelector } from '../../store'
+import { validationRules } from '../../utils/validation'
+
+const signUpValidators = {
+  first_name: validationRules.first_name,
+  second_name: validationRules.second_name,
+  email: validationRules.email,
+  phone: validationRules.phone,
+  login: validationRules.login,
+  password: validationRules.password,
+}
 
 export const SignUpPage = () => {
   const dispatch = useDispatch()
@@ -26,6 +37,8 @@ export const SignUpPage = () => {
 
   const isLoading = useSelector(selectAuthLoading)
   const error = useSelector(selectUserError)
+  const { getFieldValidationProps, validateForm } =
+    useFormValidation(signUpValidators)
 
   useEffect(() => {
     dispatch(clearUserError())
@@ -35,18 +48,19 @@ export const SignUpPage = () => {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
+    const values = {
+      first_name: String(data.get('first_name') ?? ''),
+      second_name: String(data.get('second_name') ?? ''),
+      email: String(data.get('email') ?? ''),
+      phone: String(data.get('phone') ?? ''),
+      login: String(data.get('login') ?? ''),
+      password: String(data.get('password') ?? ''),
+    }
+
+    if (!validateForm(values)) return
 
     try {
-      await dispatch(
-        register({
-          first_name: String(data.get('first_name') ?? ''),
-          second_name: String(data.get('second_name') ?? ''),
-          email: String(data.get('email') ?? ''),
-          phone: String(data.get('phone') ?? ''),
-          login: String(data.get('login') ?? ''),
-          password: String(data.get('password') ?? ''),
-        })
-      ).unwrap()
+      await dispatch(register(values)).unwrap()
 
       navigate(ROUTES.main, { replace: true })
     } catch (error: unknown) {
@@ -72,6 +86,7 @@ export const SignUpPage = () => {
             type="text"
             placeholder="Введите имя"
             autoComplete="given-name"
+            {...getFieldValidationProps('first_name')}
           />
           <FormField
             label="Фамилия"
@@ -79,6 +94,7 @@ export const SignUpPage = () => {
             type="text"
             placeholder="Введите фамилию"
             autoComplete="family-name"
+            {...getFieldValidationProps('second_name')}
           />
           <FormField
             label="Почта"
@@ -86,13 +102,15 @@ export const SignUpPage = () => {
             type="email"
             placeholder="name@example.ru"
             autoComplete="email"
+            {...getFieldValidationProps('email')}
           />
           <FormField
             label="Телефон"
             name="phone"
             type="tel"
-            placeholder="+7 999 123-45-67"
+            placeholder="89991234567"
             autoComplete="tel"
+            {...getFieldValidationProps('phone')}
           />
           <FormField
             label="Логин"
@@ -100,6 +118,7 @@ export const SignUpPage = () => {
             type="text"
             placeholder="Придумайте логин"
             autoComplete="username"
+            {...getFieldValidationProps('login')}
           />
           <FormField
             label="Пароль"
@@ -107,6 +126,7 @@ export const SignUpPage = () => {
             type="password"
             placeholder="Придумайте пароль"
             autoComplete="new-password"
+            {...getFieldValidationProps('password')}
           />
         </Fields>
         {error && <FormError role="alert">{error}</FormError>}
