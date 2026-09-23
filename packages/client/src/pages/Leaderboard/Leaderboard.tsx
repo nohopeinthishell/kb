@@ -7,18 +7,18 @@ import styled from 'styled-components'
 import { ROUTES } from '../../constants/routes'
 import { usePage } from '../../hooks/usePage'
 import { initAuth } from '../../modules/auth'
+import { fetchLeaderboard } from '../../modules/leaderboard'
 
-import { calculateScore } from '../../game/core'
-
-import { MOCK_LEADERBOARD_RECORDS } from './mockRecords'
-
-const recordsWithScore = MOCK_LEADERBOARD_RECORDS.map(record => ({
-  ...record,
-  score: calculateScore(record.money, record.reputation),
-})).sort((left, right) => right.score - left.score)
+import { selectLeaderboardRecords } from '../../slices/leaderboardSlice'
+import { useSelector } from '../../store'
 
 export const LeaderboardPage = () => {
-  usePage({ initPage: initLeaderboardPage })
+  const records = useSelector(selectLeaderboardRecords)
+
+  usePage({
+    initPage: initLeaderboardPage,
+    revalidateOnClient: true,
+  })
 
   const navigate = useNavigate()
 
@@ -58,15 +58,11 @@ export const LeaderboardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {recordsWithScore.map((record, index) => (
-                  <tr key={record.id}>
+                {records.map((record, index) => (
+                  <tr key={record.data.userId}>
                     <Cell>{index + 1}</Cell>
-                    <Cell>{record.name}</Cell>
-                    <Cell>
-                      <ScoreValue $isLost={record.money < 0}>
-                        {record.score}
-                      </ScoreValue>
-                    </Cell>
+                    <Cell>{record.data.name}</Cell>
+                    <Cell>{record.data.score}</Cell>
                   </tr>
                 ))}
               </tbody>
@@ -78,16 +74,25 @@ export const LeaderboardPage = () => {
   )
 }
 
-export const initLeaderboardPage = async (args: PageInitArgs) => initAuth(args)
+export const initLeaderboardPage = async (args: PageInitArgs) => {
+  await initAuth(args)
+
+  await args.dispatch(fetchLeaderboard(args.ctx.cookie))
+}
 
 const Page = styled.main`
-  min-height: 100%;
+  box-sizing: border-box;
+  height: 100%;
   padding: 48px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: ${({ theme }) => theme.colors.background.page};
 `
 
 const PageHeader = styled.header`
-  width: 1080px;
+  flex: 0 0 auto;
+  width: min(100%, 1080px);
   margin: 0 auto 32px;
 `
 
@@ -132,12 +137,21 @@ const Description = styled.p`
 `
 
 const Content = styled.div`
-  width: 1080px;
+  width: min(100%, 1080px);
+  min-height: 0;
   margin: 0 auto;
+  display: flex;
+  flex: 1;
 `
 
 const Card = styled.section`
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
   padding: 32px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   border: 1px solid ${({ theme }) => theme.colors.border.subtle};
   border-radius: 16px;
   background: ${({ theme }) => theme.colors.background.surface};
@@ -159,11 +173,36 @@ const SectionDescription = styled.p`
 `
 
 const TableWrapper = styled.div`
-  overflow-x: auto;
+  min-height: 0;
+  overflow: auto;
+  flex: 1;
+  scrollbar-color: ${({ theme }) =>
+    `${theme.colors.border.strong} ${theme.colors.background.surface}`};
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${({ theme }) => theme.colors.background.surface};
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid ${({ theme }) => theme.colors.background.surface};
+    border-radius: 999px;
+    background: ${({ theme }) => theme.colors.border.strong};
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${({ theme }) => theme.colors.action.primary};
+  }
 `
 
 const Table = styled.table`
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
 `
 
@@ -189,10 +228,4 @@ const Cell = styled.td`
   &:last-child {
     padding-right: 0;
   }
-`
-
-const ScoreValue = styled.span<{ $isLost: boolean }>`
-  color: ${({ theme, $isLost }) =>
-    $isLost ? theme.colors.feedback.danger : theme.colors.text.primary};
-  font-weight: 600;
 `

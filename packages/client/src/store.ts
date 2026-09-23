@@ -9,6 +9,7 @@ import { configureStore } from '@reduxjs/toolkit'
 
 import ssrReducer from './slices/ssrSlice'
 import userReducer from './slices/userSlice'
+import leaderboardReducer from './slices/leaderboardSlice'
 
 // Глобально декларируем в window наш ключик
 // и задаем ему тип такой же как у стейта в сторе
@@ -21,6 +22,7 @@ declare global {
 export const reducer = combineReducers({
   ssr: ssrReducer,
   user: userReducer,
+  leaderboard: leaderboardReducer,
 })
 
 export const store = configureStore({
