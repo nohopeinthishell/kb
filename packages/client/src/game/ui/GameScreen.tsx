@@ -1,13 +1,23 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
-import { applyAction, createNewGameState, GameAction, tick } from '../core'
+import {
+  applyAction,
+  calculateScore,
+  createNewGameState,
+  GameAction,
+  tick,
+} from '../core'
 import { EVENTS } from '../core/events'
 import EventCard from './EventCard'
 import GameOverScreen from './GameOverScreen'
 import TavernCanvas from './TavernCanvas'
+import { addUserToLeaderboard } from '../../api'
+import { useSelector } from '../../store'
+import { selectUser } from '../../slices/userSlice'
 
 const GameScreen = () => {
+  const user = useSelector(selectUser)
   const [state, setState] = useState(createNewGameState)
 
   const handlePlayAgain = () => {
@@ -15,7 +25,17 @@ const GameScreen = () => {
   }
 
   const handleNextWeek = () => {
-    setState(currentState => tick(currentState))
+    const nextState = tick(state)
+    setState(nextState)
+
+    if (state.status === 'playing' && nextState.status === 'won' && user) {
+      const score = calculateScore(nextState.money, nextState.reputation)
+      void addUserToLeaderboard({
+        userId: user.id,
+        name: user.display_name ?? user.login,
+        score,
+      })
+    }
   }
 
   const handleApplyAction = (type: GameAction) => {

@@ -15,3 +15,11 @@ export {
   type ChangePasswordRequest,
   type UpdateProfileRequest,
 } from './profile'
+
+export {
+  getLeaderboard,
+  addUserToLeaderboard,
+  type GetLeaderboardParams,
+  type AddUserToLeaderboardData,
+  type LeaderboardRecord,
+} from './leaderboard'
