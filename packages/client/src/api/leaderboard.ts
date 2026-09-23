@@ -1,7 +1,5 @@
 import { request } from './auth'
 
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
-
 export type AddUserToLeaderboardData = {
   userId: number
   score: number
