@@ -24,12 +24,14 @@ export const signInWithYandex = (data: YandexOAuthRequest) =>
 
 export const createYandexAuthorizeUrl = (
   serviceId: string,
-  redirectUri: string
+  redirectUri: string,
+  state: string
 ) => {
   const url = new URL(YANDEX_AUTHORIZE_URL)
   url.searchParams.set('response_type', 'code')
   url.searchParams.set('client_id', serviceId)
   url.searchParams.set('redirect_uri', redirectUri)
+  url.searchParams.set('state', state)
 
   return url.toString()
 }

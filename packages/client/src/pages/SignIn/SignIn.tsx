@@ -13,7 +13,7 @@ import FormUI, { FormError } from '../../ui/FormUI'
 import { createYandexAuthorizeUrl, getYandexServiceId } from '../../api'
 import { getOAuthRedirectUri, ROUTES } from '../../constants/routes'
 import { useFormValidation } from '../../hooks/useFormValidation'
-import { initAuth } from '../../modules/auth'
+import { createOAuthState, initAuth } from '../../modules/auth'
 import {
   clearUserError,
   login,
@@ -46,6 +46,7 @@ export const SignInPage = () => {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setOAuthError(null)
 
     const data = new FormData(event.currentTarget)
     const values = {
@@ -66,6 +67,7 @@ export const SignInPage = () => {
   }
 
   async function handleYandexSignIn() {
+    dispatch(clearUserError())
     setIsOAuthLoading(true)
     setOAuthError(null)
 
@@ -73,7 +75,12 @@ export const SignInPage = () => {
       const redirectUri = getOAuthRedirectUri(window.location.origin)
       const { service_id: serviceId } = await getYandexServiceId(redirectUri)
 
-      window.location.href = createYandexAuthorizeUrl(serviceId, redirectUri)
+      const state = createOAuthState()
+      window.location.href = createYandexAuthorizeUrl(
+        serviceId,
+        redirectUri,
+        state
+      )
     } catch (requestError) {
       setOAuthError(
         requestError instanceof Error
