@@ -15,3 +15,8 @@ export {
   type ChangePasswordRequest,
   type UpdateProfileRequest,
 } from './profile'
+export {
+  createYandexAuthorizeUrl,
+  getYandexServiceId,
+  signInWithYandex,
+} from './oauth'
