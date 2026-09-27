@@ -116,7 +116,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.root,
-    Component: (
+    element: (
       <ProtectedRoute>
         <ForumPage />
       </ProtectedRoute>
@@ -125,7 +125,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.topic,
-    Component: (
+    element: (
       <ProtectedRoute>
         <TopicPage />
       </ProtectedRoute>
@@ -134,7 +134,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.create,
-    Component: (
+    element: (
       <ProtectedRoute>
         <NewTopicPage />
       </ProtectedRoute>
