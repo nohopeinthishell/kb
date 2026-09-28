@@ -20,3 +20,11 @@ export {
   getYandexServiceId,
   signInWithYandex,
 } from './oauth'
+
+export {
+  getLeaderboard,
+  addUserToLeaderboard,
+  type GetLeaderboardParams,
+  type AddUserToLeaderboardData,
+  type LeaderboardRecord,
+} from './leaderboard'

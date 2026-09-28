@@ -1,21 +1,63 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { applyAction, createNewGameState, GameAction, tick } from '../core'
+import {
+  applyAction,
+  calculateScore,
+  createNewGameState,
+  GameAction,
+  tick,
+} from '../core'
 import { EVENTS } from '../core/events'
 import EventCard from './EventCard'
 import GameOverScreen from './GameOverScreen'
 import TavernCanvas from './TavernCanvas'
+import { addUserToLeaderboard, type AddUserToLeaderboardData } from '../../api'
+import { useSelector } from '../../store'
+import { selectUser } from '../../slices/userSlice'
 
 const GameScreen = () => {
+  const user = useSelector(selectUser)
   const [state, setState] = useState(createNewGameState)
+  const [submission, setSubmission] = useState<{
+    data: AddUserToLeaderboardData
+    status: 'saving' | 'saved' | 'error'
+  } | null>(null)
+  const gameId = useRef(0)
+
+  const saveResult = async (data: AddUserToLeaderboardData) => {
+    const currentGameId = gameId.current
+    setSubmission({ data, status: 'saving' })
+    try {
+      await addUserToLeaderboard(data)
+      if (gameId.current === currentGameId) {
+        setSubmission({ data, status: 'saved' })
+      }
+    } catch {
+      if (gameId.current === currentGameId) {
+        setSubmission({ data, status: 'error' })
+      }
+    }
+  }
 
   const handlePlayAgain = () => {
+    gameId.current += 1
+    setSubmission(null)
     setState(createNewGameState())
   }
 
   const handleNextWeek = () => {
-    setState(currentState => tick(currentState))
+    const nextState = tick(state)
+    setState(nextState)
+
+    if (state.status === 'playing' && nextState.status === 'won' && user) {
+      const score = calculateScore(nextState.money, nextState.reputation)
+      void saveResult({
+        userId: user.id,
+        name: user.display_name ?? user.login,
+        score,
+      })
+    }
   }
 
   const handleApplyAction = (type: GameAction) => {
@@ -91,12 +133,18 @@ const GameScreen = () => {
         </NextWeekButton>
       </Controls>
 
-      {isGameFinished && (
+      {(state.status === 'won' || state.status === 'lost') && (
         <GameOverScreen
           status={state.status}
           money={state.money}
           reputation={state.reputation}
           onPlayAgain={handlePlayAgain}
+          submissionStatus={submission?.status}
+          onRetrySave={
+            submission?.status === 'error'
+              ? () => void saveResult(submission.data)
+              : undefined
+          }
         />
       )}
     </Page>
