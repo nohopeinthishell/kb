@@ -7,7 +7,7 @@ import express, {
   Request as ExpressRequest,
 } from 'express'
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 
 import fs from 'fs/promises'
 import { createServer as createViteServer, ViteDevServer } from 'vite'
@@ -114,7 +114,9 @@ async function createServer() {
         )
 
         // Импортируем этот модуль и вызываем с инишл стейтом
-        render = (await import(pathToServer)).render
+        // import() ждёт URL: на Windows путь 'D:\...' читается как схема 'd:'
+        // и `yarn preview` падает. На Linux работает и без обёртки.
+        render = (await import(pathToFileURL(pathToServer).href)).render
       }
 
       // Получаем HTML-строку из JSX
