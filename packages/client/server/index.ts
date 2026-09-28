@@ -80,6 +80,7 @@ async function createServer() {
       // Создаём переменные
       let render: (req: ExpressRequest) => Promise<{
         html: string
+        statusCode: number
         initialState: unknown
         helmet: HelmetServerState
         styleTags: string
@@ -122,6 +123,7 @@ async function createServer() {
       // Получаем HTML-строку из JSX
       const {
         html: appHtml,
+        statusCode,
         initialState,
         helmet,
         styleTags,
@@ -143,7 +145,7 @@ async function createServer() {
         )
 
       // Завершаем запрос и отдаём HTML-страницу
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
+      res.status(statusCode).set({ 'Content-Type': 'text/html' }).end(html)
     } catch (e) {
       vite?.ssrFixStacktrace(e as Error)
       next(e)
