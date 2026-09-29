@@ -15,6 +15,7 @@ import TavernCanvas from './TavernCanvas'
 import { addUserToLeaderboard, type AddUserToLeaderboardData } from '../../api'
 import { useSelector } from '../../store'
 import { selectUser } from '../../slices/userSlice'
+import { useFullscreen } from '../../hooks/useFullscreen'
 
 const GameScreen = () => {
   const user = useSelector(selectUser)
@@ -24,6 +25,8 @@ const GameScreen = () => {
     status: 'saving' | 'saved' | 'error'
   } | null>(null)
   const gameId = useRef(0)
+  const pageRef = useRef<HTMLElement>(null)
+  const { isSupported, isFullscreen, toggle } = useFullscreen(pageRef)
 
   const saveResult = async (data: AddUserToLeaderboardData) => {
     const currentGameId = gameId.current
@@ -82,11 +85,19 @@ const GameScreen = () => {
   const isEveryTableNew = state.tavern.tables.every(t => t.condition === 'new')
 
   return (
-    <Page>
+    <Page ref={pageRef}>
       <StatusBar>
         <span>Неделя: {state.week} из 6</span>
         <span>Казна: {state.money}</span>
         <span>Репутация: {state.reputation}</span>
+        {isSupported && (
+          <FullscreenButton
+            type="button"
+            onClick={toggle}
+            aria-pressed={isFullscreen}>
+            {isFullscreen ? 'Выйти' : 'На весь экран'}
+          </FullscreenButton>
+        )}
       </StatusBar>
 
       <CanvasFrame>
@@ -154,7 +165,6 @@ const GameScreen = () => {
 const Page = styled.main`
   box-sizing: border-box;
   width: min(100%, 1048px);
-  height: 100vh;
   height: 100dvh;
   margin: 0 auto;
   padding: clamp(8px, 2.5vh, 24px);
@@ -162,11 +172,17 @@ const Page = styled.main`
   flex-direction: column;
   gap: clamp(8px, 1.5vh, 16px);
   overflow: hidden;
+
+  /* Без своего фона за полноэкранным элементом виден чёрный ::backdrop */
+  &:fullscreen {
+    background: ${({ theme }) => theme.colors.background.page};
+  }
 `
 
 const StatusBar = styled.div`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 16px;
@@ -218,6 +234,23 @@ const ActionButton = styled.button`
 
 const NextWeekButton = styled(ActionButton)`
   margin-left: auto;
+`
+
+const FullscreenButton = styled.button`
+  padding: 6px 12px;
+  color: ${({ theme }) => theme.colors.action.secondaryText};
+  background: ${({ theme }) => theme.colors.action.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.action.secondaryHover};
+  }
+
+  &:active {
+    background: ${({ theme }) => theme.colors.action.secondaryActive};
+  }
 `
 
 export default GameScreen
