@@ -11,6 +11,7 @@ import { initLeaderboardPage, LeaderboardPage } from './pages/Leaderboard'
 import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
+import type { ReactElement } from 'react'
 import {
   OAuthCallbackRoute,
   ProtectedRoute,
@@ -30,7 +31,13 @@ export type PageInitArgs = {
   ctx: PageInitContext
 }
 
-export const routes = [
+type AppRoute = {
+  path: string
+  element: ReactElement
+  fetchData?: (args: PageInitArgs) => Promise<void>
+}
+
+export const routes: AppRoute[] = [
   {
     path: ROUTES.main,
     element: (
@@ -116,7 +123,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.root,
-    Component: (
+    element: (
       <ProtectedRoute>
         <ForumPage />
       </ProtectedRoute>
@@ -125,7 +132,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.topic,
-    Component: (
+    element: (
       <ProtectedRoute>
         <TopicPage />
       </ProtectedRoute>
@@ -134,7 +141,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.create,
-    Component: (
+    element: (
       <ProtectedRoute>
         <NewTopicPage />
       </ProtectedRoute>

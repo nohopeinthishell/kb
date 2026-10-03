@@ -2,9 +2,12 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import { HelmetServerState } from 'react-helmet-async'
-import express, { Request as ExpressRequest } from 'express'
+import express, {
+  ErrorRequestHandler,
+  Request as ExpressRequest,
+} from 'express'
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 
 import fs from 'fs/promises'
 import { createServer as createViteServer, ViteDevServer } from 'vite'
@@ -15,6 +18,40 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const port = process.env.PORT || 80
 const clientPath = path.join(__dirname, '..')
 const isDev = process.env.NODE_ENV === 'development'
+
+// Отдаётся, когда упал сам рендер React,
+// поэтому ни от React, ни от бандла стилей, ни от файлов на диске не зависит
+const ERROR_HTML = `<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Что-то пошло не так | Таверна</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: system-ui, sans-serif;
+        background: #f5f3ee;
+        color: #2b2a27;
+        text-align: center;
+      }
+      main { padding: 24px; max-width: 440px; }
+      h1 { margin: 0 0 12px; font-size: 28px; }
+      p { margin: 0 0 24px; line-height: 1.5; }
+      a { color: inherit; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Таверна временно закрыта</h1>
+      <p>На сервере что-то сломалось. Мы уже знаем о проблеме и чиним её — попробуйте зайти чуть позже.</p>
+      <a href="/">Вернуться на главную</a>
+    </main>
+  </body>
+</html>`
 
 async function createServer() {
   const app = express()
@@ -43,6 +80,7 @@ async function createServer() {
       // Создаём переменные
       let render: (req: ExpressRequest) => Promise<{
         html: string
+        statusCode: number
         initialState: unknown
         helmet: HelmetServerState
         styleTags: string
@@ -77,12 +115,15 @@ async function createServer() {
         )
 
         // Импортируем этот модуль и вызываем с инишл стейтом
-        render = (await import(pathToServer)).render
+        // import() ждёт URL: на Windows путь 'D:\...' читается как схема 'd:'
+        // и `yarn preview` падает. На Linux работает и без обёртки.
+        render = (await import(pathToFileURL(pathToServer).href)).render
       }
 
       // Получаем HTML-строку из JSX
       const {
         html: appHtml,
+        statusCode,
         initialState,
         helmet,
         styleTags,
@@ -104,12 +145,22 @@ async function createServer() {
         )
 
       // Завершаем запрос и отдаём HTML-страницу
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
+      res.status(statusCode).set({ 'Content-Type': 'text/html' }).end(html)
     } catch (e) {
-      vite.ssrFixStacktrace(e as Error)
+      vite?.ssrFixStacktrace(e as Error)
       next(e)
     }
   })
+
+  const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+    console.error(err)
+    if (res.headersSent) {
+      return next(err)
+    }
+    res.status(500).set({ 'Content-Type': 'text/html' }).end(ERROR_HTML)
+  }
+
+  app.use(errorHandler)
 
   app.listen(port, () => {
     console.log(`Client is listening on port: ${port}`)

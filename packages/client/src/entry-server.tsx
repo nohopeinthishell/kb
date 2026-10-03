@@ -44,11 +44,9 @@ export const render = async (req: ExpressRequest) => {
     throw new Error('Страница не найдена!')
   }
 
-  const [
-    {
-      route: { fetchData },
-    },
-  ] = foundRoutes
+  const matchedRoute = foundRoutes[foundRoutes.length - 1].route
+  const statusCode = matchedRoute.path === '*' ? 404 : 200
+  const fetchData = matchedRoute.fetchData
 
   try {
     if (fetchData) {
@@ -86,6 +84,7 @@ export const render = async (req: ExpressRequest) => {
 
     return {
       html,
+      statusCode,
       helmet: helmetContext.helmet as HelmetServerState,
       styleTags,
       initialState: store.getState(),
