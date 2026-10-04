@@ -8,13 +8,12 @@ WORKDIR /app
 FROM base AS builder
 
 COPY package.json yarn.lock ./
+COPY packages/server/package.json packages/server/
 RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN yarn lerna bootstrap
-RUN rm -rf /app/packages/server/dist/ && yarn build --scope=server
-
+RUN yarn build --scope=server
 
 FROM node:$NODE_VERSION-bookworm-slim AS production
 WORKDIR /app
