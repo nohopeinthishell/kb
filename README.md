@@ -137,7 +137,7 @@ docs/               # документация проекта
 
 
 `docker compose up` - запустит три сервиса
-1. node, отдающий клиент с серверным рендером (client) — см. `Dockerfile.client`
+1. node, отдающий клиент с серверным рендером (client) — см. `d-client.Dockerfile`
 2. node, ваш сервер (server)
 3. postgres, вашу базу данных (postgres)
 
