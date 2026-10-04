@@ -1,0 +1,11 @@
+/.claude
+/.github
+/.idea
+/docs
+**/node_modules
+**/dist
+/scripts
+/tmp
+.env
+.env.*
+.git
