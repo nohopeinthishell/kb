@@ -13,6 +13,7 @@ import FormUI, { FormError } from '../../ui/FormUI'
 import { createYandexAuthorizeUrl, getYandexServiceId } from '../../api'
 import { getOAuthRedirectUri, ROUTES } from '../../constants/routes'
 import { useFormValidation } from '../../hooks/useFormValidation'
+import { usePage } from '../../hooks/usePage'
 import { createOAuthState, initAuth } from '../../modules/auth'
 import {
   clearUserError,
@@ -30,6 +31,8 @@ const signInValidators = {
 }
 
 export const SignInPage = () => {
+  usePage({ initPage: initSignInPage })
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
 

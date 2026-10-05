@@ -7,8 +7,13 @@ import { ROUTES } from '../../constants/routes'
 import { NotFoundPage } from '../NotFound'
 import { TopicComments } from '../../modules/forum'
 import BackLink from '../../ui/BackLink'
+import { usePage } from '../../hooks/usePage'
+import { initAuth } from '../../modules/auth'
+import type { PageInitArgs } from '../../routes'
 
 export const TopicPage = () => {
+  usePage({ initPage: initTopicPage })
+
   const { topicId } = useParams()
   const id = Number(topicId)
   const topic = Number.isInteger(id) && id > 0 ? getTopic(id) : null
@@ -74,4 +79,4 @@ const Meta = styled.div`
   font-size: 14px;
 `
 
-export const initTopicPage = async () => Promise.resolve()
+export const initTopicPage = async (args: PageInitArgs) => initAuth(args)

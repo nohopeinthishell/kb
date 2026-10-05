@@ -1,3 +1,6 @@
+import { Route, Routes } from 'react-router-dom'
+import type { ReactElement } from 'react'
+
 import { AppDispatch, RootState } from './store'
 
 import { initMainPage, MainPage } from './pages/Main'
@@ -11,7 +14,6 @@ import { initLeaderboardPage, LeaderboardPage } from './pages/Leaderboard'
 import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
-import type { ReactElement } from 'react'
 import {
   OAuthCallbackRoute,
   ProtectedRoute,
@@ -149,3 +151,11 @@ export const routes: AppRoute[] = [
     fetchData: initNewTopicPage,
   },
 ]
+
+export const AppRoutes = () => (
+  <Routes>
+    {routes.map(({ path, element }) => (
+      <Route key={path} path={path} element={element} />
+    ))}
+  </Routes>
+)
