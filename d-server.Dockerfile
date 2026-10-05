@@ -19,9 +19,13 @@ FROM node:$NODE_VERSION-bookworm-slim AS production
 ARG SERVER_PORT
 WORKDIR /app
 
-COPY --from=builder /app/packages/server/dist/ /app/
-COPY --from=builder /app/packages/server/package.json /app/package.json
-RUN yarn install --production=true
+COPY --from=builder /app/package.json package.json
+COPY --from=builder /app/yarn.lock yarn.lock
+
+COPY --from=builder /app/packages/server/package.json packages/server/package.json
+RUN yarn install --frozen-lockfile --production=true
+
+COPY --from=builder /app/packages/server/dist/ packages/server/dist/
 
 EXPOSE $SERVER_PORT
-CMD [ "node", "/app/index.js" ]
+CMD [ "node", "/app/packages/server/dist/index.js" ]
