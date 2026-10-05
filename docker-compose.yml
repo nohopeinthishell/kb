@@ -16,6 +16,9 @@ services:
 
   server:
     container_name: practicum-server
+    depends_on:
+      postgres:
+        condition: service_healthy
     image: practicum-server
     build:
       context: .
@@ -35,6 +38,11 @@ services:
 
   postgres:
     image: postgres:14
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     ports:
       - "${POSTGRES_PORT}:5432"
     environment:
