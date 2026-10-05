@@ -19,6 +19,9 @@ FROM node:$NODE_VERSION-bookworm-slim AS production
 ARG SERVER_PORT
 WORKDIR /app
 
+# Зависимости ставятся строго по yarn.lock: без него yarn берёт свежие версии из диапазонов,
+# и в проде оказываются не те версии, с которыми собран и проверен код.
+# Манифест client не копируется намеренно: ставим зависимости только сервера (Yarn 1 это допускает).
 COPY --from=builder /app/package.json package.json
 COPY --from=builder /app/yarn.lock yarn.lock
 
