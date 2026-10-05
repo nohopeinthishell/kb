@@ -15,7 +15,7 @@ import serialize from 'serialize-javascript'
 import cookieParser from 'cookie-parser'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const port = process.env.PORT || 80
+const port = Number(process.env.CLIENT_PORT) || 3000
 const clientPath = path.join(__dirname, '..')
 const isDev = process.env.NODE_ENV === 'development'
 
