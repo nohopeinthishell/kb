@@ -12,6 +12,7 @@ import FormUI, { FormError } from '../../ui/FormUI'
 
 import { ROUTES } from '../../constants/routes'
 import { useFormValidation } from '../../hooks/useFormValidation'
+import { usePage } from '../../hooks/usePage'
 import { initAuth } from '../../modules/auth'
 import {
   clearUserError,
@@ -32,6 +33,8 @@ const signUpValidators = {
 }
 
 export const SignUpPage = () => {
+  usePage({ initPage: initSignUpPage })
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
 

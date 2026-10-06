@@ -6,55 +6,60 @@ import { initAuth } from '../../modules/auth'
 import type { PageInitArgs } from '../../routes'
 // Vite отдаёт из импорта картинки готовый URL, а не сам файл
 import tavernBg from './tavern.webp'
+import { usePage } from '../../hooks/usePage'
 
-export const MainPage = () => (
-  <Page>
-    <Backdrop />
+export const MainPage = () => {
+  usePage({ initPage: initMainPage })
 
-    <Helmet>
-      <title>Таверна</title>
-    </Helmet>
+  return (
+    <Page>
+      <Backdrop />
 
-    <WidthLimiter>
-      <Header>
-        <Title>Таверна</Title>
-        <Description>
-          Ты держишь придорожную таверну шесть недель. Каждую неделю приходит
-          новое происшествие — реши, что с ним делать, и потрать золото на
-          ремонт столов, помощников и провизию. Задача: дожить до конца шестой
-          недели, не разорившись, и набрать как можно больше очков. Одна партия
-          — 5–7 минут.
-        </Description>
-      </Header>
-      <Content>
-        <nav>
-          <MenuList>
-            <li>
-              <LinkUI to={ROUTES.startGame} $variant="primary">
-                Играть
-              </LinkUI>
-            </li>
-            <li>
-              <LinkUI to={ROUTES.forum.root} $variant="secondary">
-                Форум
-              </LinkUI>
-            </li>
-            <li>
-              <LinkUI to={ROUTES.leaderboard} $variant="secondary">
-                Лидерборд
-              </LinkUI>
-            </li>
-            <li>
-              <LinkUI to={ROUTES.profile} $variant="secondary">
-                Профиль
-              </LinkUI>
-            </li>
-          </MenuList>
-        </nav>
-      </Content>
-    </WidthLimiter>
-  </Page>
-)
+      <Helmet>
+        <title>Таверна</title>
+      </Helmet>
+
+      <WidthLimiter>
+        <Header>
+          <Title>Таверна</Title>
+          <Description>
+            Ты держишь придорожную таверну шесть недель. Каждую неделю приходит
+            новое происшествие — реши, что с ним делать, и потрать золото на
+            ремонт столов, помощников и провизию. Задача: дожить до конца шестой
+            недели, не разорившись, и набрать как можно больше очков. Одна
+            партия — 5–7 минут.
+          </Description>
+        </Header>
+        <Content>
+          <nav>
+            <MenuList>
+              <li>
+                <LinkUI to={ROUTES.startGame} $variant="primary">
+                  Играть
+                </LinkUI>
+              </li>
+              <li>
+                <LinkUI to={ROUTES.forum.root} $variant="secondary">
+                  Форум
+                </LinkUI>
+              </li>
+              <li>
+                <LinkUI to={ROUTES.leaderboard} $variant="secondary">
+                  Лидерборд
+                </LinkUI>
+              </li>
+              <li>
+                <LinkUI to={ROUTES.profile} $variant="secondary">
+                  Профиль
+                </LinkUI>
+              </li>
+            </MenuList>
+          </nav>
+        </Content>
+      </WidthLimiter>
+    </Page>
+  )
+}
 
 const Page = styled.main`
   position: relative; /* якорь для Backdrop */
