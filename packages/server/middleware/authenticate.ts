@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 
-const AUTH_USER_URL = 'https://ya-praktikum.tech/api/v2/auth/user'
+import { COURSE_API_URL } from './courseApiProxy'
 const AUTH_TIMEOUT_MS = 5000
 
 export type AuthenticatedUser = {
@@ -24,7 +24,10 @@ function isAuthenticatedUser(value: unknown): value is AuthenticatedUser {
   )
 }
 
-export function authenticate(fetchUser: typeof fetch = fetch): RequestHandler {
+export function authenticate(
+  fetchUser: typeof fetch = fetch,
+  apiUrl = COURSE_API_URL
+): RequestHandler {
   return async (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store')
     const cookie = req.headers.cookie
@@ -36,11 +39,14 @@ export function authenticate(fetchUser: typeof fetch = fetch): RequestHandler {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), AUTH_TIMEOUT_MS)
     try {
-      const response = await fetchUser(AUTH_USER_URL, {
-        headers: { Cookie: cookie },
-        signal: controller.signal,
-        redirect: 'error',
-      })
+      const response = await fetchUser(
+        `${apiUrl.replace(/\/$/, '')}/auth/user`,
+        {
+          headers: { Cookie: cookie },
+          signal: controller.signal,
+          redirect: 'error',
+        }
+      )
 
       if (response.status === 401 || response.status === 403) {
         res.status(401).json({ reason: 'Authentication required' })

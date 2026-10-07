@@ -28,6 +28,7 @@ services:
             - "${SERVER_PORT}:${SERVER_PORT}"
         environment:
           SERVER_PORT: ${SERVER_PORT}
+          AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-true}
           CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:3000}
 
     postgres:

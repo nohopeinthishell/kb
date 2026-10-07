@@ -1,8 +1,11 @@
 import cors from 'cors'
 import express from 'express'
-import { authenticate } from './middleware'
+import { authenticate, courseApiProxy, CourseApiOptions } from './middleware'
 
-export function createApp(fetchUser: typeof fetch = fetch) {
+export function createApp(
+  fetchUser: typeof fetch = fetch,
+  options: CourseApiOptions = {}
+) {
   const app = express()
   // Preflight requests must complete before session validation.
   app.use(
@@ -11,7 +14,31 @@ export function createApp(fetchUser: typeof fetch = fetch) {
       credentials: true,
     })
   )
-  app.use(authenticate(fetchUser))
+  const verifySession = authenticate(fetchUser, options.apiUrl)
+  // These bootstrap endpoints cannot require a session before login.
+  const publicEndpoints = new Set([
+    'POST /auth/signin',
+    'POST /auth/signup',
+    'POST /oauth/yandex',
+    'GET /oauth/yandex/service-id',
+  ])
+  app.use(
+    '/api/v2',
+    (req, res, next) => {
+      if (
+        req.headers.origin &&
+        req.headers.origin !==
+          (process.env.CLIENT_ORIGIN || 'http://localhost:3000')
+      ) {
+        res.status(403).json({ reason: 'Origin not allowed' })
+        return
+      }
+      if (publicEndpoints.has(`${req.method} ${req.path}`)) next()
+      else verifySession(req, res, next)
+    },
+    courseApiProxy(options)
+  )
+  app.use(verifySession)
 
   app.get('/friends', (_, res) => {
     res.json([
