@@ -16,7 +16,7 @@ jobs:
         with:
           # Должна совпадать с ARG NODE_VERSION в d-client.Dockerfile и d-server.Dockerfile:
           # CI проверяет код на той же мажорной версии, на которой он работает в контейнере.
-          node-version: 24
+          node-version: 22
       - name: Install main deps
         run: yarn
       - name: Initialize
