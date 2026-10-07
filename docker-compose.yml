@@ -28,6 +28,7 @@ services:
             - "${SERVER_PORT}:${SERVER_PORT}"
         environment:
           SERVER_PORT: ${SERVER_PORT}
+          CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:3000}
 
     postgres:
       image: postgres:14
