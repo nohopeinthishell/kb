@@ -71,7 +71,7 @@ function createSessionHandler(
 
       if (!isResponseOpen()) return
       if (response.status === 401 || response.status === 403) {
-        res.status(401).json({ reason: 'Authentication required' })
+        res.status(403).json({ reason: 'Authentication required' })
         return
       }
       if (!response.ok) {
