@@ -1,6 +1,7 @@
 export {
   ApiError,
   getCurrentUser,
+  getCourseApiUrl,
   logout,
   signIn,
   signUp,

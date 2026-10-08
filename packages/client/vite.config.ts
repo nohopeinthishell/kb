@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import dotenv from 'dotenv'
 import path from 'path'
-dotenv.config()
+dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,8 +10,12 @@ export default defineConfig({
     port: Number(process.env.CLIENT_PORT) || 3000,
   },
   define: {
-    __EXTERNAL_SERVER_URL__: JSON.stringify(process.env.EXTERNAL_SERVER_URL),
-    __INTERNAL_SERVER_URL__: JSON.stringify(process.env.INTERNAL_SERVER_URL),
+    __EXTERNAL_SERVER_URL__: JSON.stringify(
+      process.env.EXTERNAL_SERVER_URL || 'http://localhost:3001'
+    ),
+    __INTERNAL_SERVER_URL__: JSON.stringify(
+      process.env.INTERNAL_SERVER_URL || 'http://localhost:3001'
+    ),
   },
   build: {
     outDir: path.join(__dirname, 'dist/client'),
