@@ -1,6 +1,11 @@
 import cors from 'cors'
 import express from 'express'
-import { authenticate, courseApiProxy, CourseApiOptions } from './middleware'
+import {
+  authenticate,
+  getAuthenticatedUser,
+  courseApiProxy,
+  CourseApiOptions,
+} from './middleware'
 
 export function createApp(
   fetchUser: typeof fetch = fetch,
@@ -22,17 +27,21 @@ export function createApp(
     'POST /oauth/yandex',
     'GET /oauth/yandex/service-id',
   ])
+  app.use('/api/v2', (req, res, next) => {
+    if (
+      req.headers.origin &&
+      req.headers.origin !==
+        (process.env.CLIENT_ORIGIN || 'http://localhost:3000')
+    ) {
+      res.status(403).json({ reason: 'Origin not allowed' })
+      return
+    }
+    next()
+  })
+  app.get('/api/v2/auth/user', getAuthenticatedUser(fetchUser, options.apiUrl))
   app.use(
     '/api/v2',
     (req, res, next) => {
-      if (
-        req.headers.origin &&
-        req.headers.origin !==
-          (process.env.CLIENT_ORIGIN || 'http://localhost:3000')
-      ) {
-        res.status(403).json({ reason: 'Origin not allowed' })
-        return
-      }
       if (publicEndpoints.has(`${req.method} ${req.path}`)) next()
       else verifySession(req, res, next)
     },

@@ -1,4 +1,4 @@
-export { authenticate } from './authenticate'
+export { authenticate, getAuthenticatedUser } from './authenticate'
 export type { AuthenticatedUser, AuthenticatedLocals } from './authenticate'
 export {
   courseApiProxy,
@@ -6,3 +6,4 @@ export {
   rewriteSessionCookie,
 } from './courseApiProxy'
 export type { CourseApiOptions } from './courseApiProxy'
+export { filterCourseApiCookies } from './filterCourseApiCookies'

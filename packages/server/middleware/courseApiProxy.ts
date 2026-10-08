@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
+import { filterCourseApiCookies } from './filterCourseApiCookies'
 
 export const COURSE_API_URL = 'https://ya-praktikum.tech/api/v2'
 
@@ -39,10 +40,12 @@ export function courseApiProxy(options: CourseApiOptions = {}): RequestHandler {
   return (req, res) => {
     res.setHeader('Cache-Control', 'no-store')
     const headers: Record<string, string> = {}
-    for (const name of ['accept', 'content-type', 'content-length', 'cookie']) {
+    for (const name of ['accept', 'content-type', 'content-length']) {
       const value = req.headers[name]
       if (typeof value === 'string') headers[name] = value
     }
+    const cookie = filterCourseApiCookies(req.headers.cookie)
+    if (cookie) headers.cookie = cookie
     const upstream = send(
       {
         protocol: target.protocol,
