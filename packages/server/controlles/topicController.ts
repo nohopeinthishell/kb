@@ -3,9 +3,45 @@ import type { Response, Request } from 'express'
 import type { AuthenticatedLocals } from '../middleware'
 import { Topic } from '../models'
 
-export const getTopics = async (_req: Request, res: Response) => {
+export const getTopics = async (req: Request, res: Response) => {
+  if (
+    req.query.limit !== undefined &&
+    (typeof req.query.limit !== 'string' || !/^\d+$/.test(req.query.limit))
+  )
+    return res
+      .status(400)
+      .json({ reason: 'Параметр limit должен быть целым числом от 1 до 50' })
+
+  if (
+    req.query.offset !== undefined &&
+    (typeof req.query.offset !== 'string' || !/^\d+$/.test(req.query.offset))
+  )
+    return res
+      .status(400)
+      .json({ reason: 'Параметр offset должен быть целым числом не меньше 0' })
+
+  const limit = req.query.limit === undefined ? 20 : Number(req.query.limit)
+  const offset = req.query.offset === undefined ? 0 : Number(req.query.offset)
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 50)
+    return res
+      .status(400)
+      .json({ reason: 'Параметр limit должен быть целым числом от 1 до 50' })
+
+  if (!Number.isSafeInteger(offset) || offset < 0)
+    return res
+      .status(400)
+      .json({ reason: 'Параметр offset должен быть целым числом не меньше 0' })
+
   try {
-    const topics = await Topic.findAll()
+    const topics = await Topic.findAll({
+      limit: limit,
+      offset,
+      order: [
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
+    })
 
     return res.status(200).json(topics)
   } catch (e) {

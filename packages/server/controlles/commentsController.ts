@@ -1,9 +1,39 @@
 import { isPlainObject } from '../utils'
 import type { Response, Request } from 'express'
+import { ForeignKeyConstraintError } from 'sequelize'
 import type { AuthenticatedLocals } from '../middleware'
 import { Comment, Reaction, Topic } from '../models'
 
 export const getComments = async (req: Request, res: Response) => {
+  if (
+    req.query.limit !== undefined &&
+    (typeof req.query.limit !== 'string' || !/^\d+$/.test(req.query.limit))
+  )
+    return res
+      .status(400)
+      .json({ reason: 'Параметр limit должен быть целым числом от 1 до 50' })
+
+  if (
+    req.query.offset !== undefined &&
+    (typeof req.query.offset !== 'string' || !/^\d+$/.test(req.query.offset))
+  )
+    return res
+      .status(400)
+      .json({ reason: 'Параметр offset должен быть целым числом не меньше 0' })
+
+  const limit = req.query.limit === undefined ? 20 : Number(req.query.limit)
+  const offset = req.query.offset === undefined ? 0 : Number(req.query.offset)
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 50)
+    return res
+      .status(400)
+      .json({ reason: 'Параметр limit должен быть целым числом от 1 до 50' })
+
+  if (!Number.isSafeInteger(offset) || offset < 0)
+    return res
+      .status(400)
+      .json({ reason: 'Параметр offset должен быть целым числом не меньше 0' })
+
   try {
     if (!(typeof req.query.topicId === 'string'))
       return res
@@ -20,7 +50,10 @@ export const getComments = async (req: Request, res: Response) => {
     if (!topic) return res.status(404).json({ reason: 'Топик не найден' })
 
     const comments = await Comment.findAll({
-      where: { topicId },
+      where: { topicId, parentCommentId: null },
+      limit,
+      offset,
+      order: [['id', 'ASC']],
       include: [{ model: Reaction, as: 'reactions' }],
     })
 
@@ -98,6 +131,10 @@ export const createComment = async (
 
     return res.status(201).json(comment)
   } catch (e) {
+    if (e instanceof ForeignKeyConstraintError)
+      return res
+        .status(404)
+        .json({ reason: 'Топик или родительский комментарий не найден' })
     console.error(e)
     return res.status(500).json({ reason: 'Не удалось создать комментарий' })
   }
