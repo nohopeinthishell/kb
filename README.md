@@ -29,6 +29,7 @@ React + TypeScript, игровой зал отрисовывается чере�
 |---|---|
 | [docs/game-plan.md](docs/game-plan.md) | Что за игра, что видит игрок, как проходит партия |
 | [docs/architecture.md](docs/architecture.md) | Слои, границы модулей, ограничения SSR |
+| [docs/forum-api.md](docs/forum-api.md) | API форума: маршруты, авторизация, комментарии, ответы и реакции |
 | [docs/contributing.md](docs/contributing.md) | Правила разработки, git, ревью и спринта |
 | [AGENTS.md](AGENTS.md) | Инструкции для AI-помощников |
 
