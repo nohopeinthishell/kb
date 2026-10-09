@@ -1,5 +1,6 @@
 import { isPlainObject } from '../utils'
 import type { Response, Request } from 'express'
+import { ForeignKeyConstraintError } from 'sequelize'
 import type { AuthenticatedLocals } from '../middleware'
 import { Comment, Reaction, Topic } from '../models'
 
@@ -98,6 +99,10 @@ export const createComment = async (
 
     return res.status(201).json(comment)
   } catch (e) {
+    if (e instanceof ForeignKeyConstraintError)
+      return res
+        .status(404)
+        .json({ reason: 'Топик или родительский комментарий не найден' })
     console.error(e)
     return res.status(500).json({ reason: 'Не удалось создать комментарий' })
   }
