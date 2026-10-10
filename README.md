@@ -107,6 +107,12 @@ docs/               # документация проекта
 
 ### Production build
 
+Host builds use `INTERNAL_SERVER_URL=http://localhost:3001` from `.env.sample`,
+so SSR can reach the backend when running `yarn preview --scope client` locally.
+Docker Compose explicitly passes `http://server:${SERVER_PORT}` as a client build
+argument; standalone Docker builds default to `http://server:3001`. This override
+applies during compilation because Vite embeds the SSR backend URL in the bundle.
+
 ```yarn build```
 
 И чтобы посмотреть что получилось

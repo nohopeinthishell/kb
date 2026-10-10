@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async'
 import styled from 'styled-components'
 
 import { ROUTES } from '../../constants/routes'
+import { usePage } from '../../hooks/usePage'
 import { initAuth } from '../../modules/auth'
 import type { PageInitArgs } from '../../routes'
 import LinkUI from '../../ui/LinkUI'
@@ -24,97 +25,101 @@ const WEEK_STEPS = [
   },
 ]
 
-export const StartGamePage = () => (
-  <Page>
-    <Helmet>
-      <title>Как играть — Таверна</title>
-      <meta
-        name="description"
-        content="Краткие правила экономической игры «Таверна»"
-      />
-    </Helmet>
+export const StartGamePage = () => {
+  usePage({ initPage: initStartGamePage })
 
-    <Content>
-      <Header>
-        <Eyebrow>Перед открытием</Eyebrow>
-        <Title>Продержитесь шесть недель</Title>
-        <Lead>
-          Управляйте придорожной таверной, принимайте решения и не дайте
-          заведению разориться. Одна партия занимает 5–7 минут.
-        </Lead>
-      </Header>
+  return (
+    <Page>
+      <Helmet>
+        <title>Как играть — Таверна</title>
+        <meta
+          name="description"
+          content="Краткие правила экономической игры «Таверна»"
+        />
+      </Helmet>
 
-      <Summary aria-label="Цель игры">
-        <SummaryItem>
-          <SummaryValue>6</SummaryValue>
-          <SummaryLabel>игровых недель</SummaryLabel>
-        </SummaryItem>
-        <SummaryItem>
-          <SummaryValue>2</SummaryValue>
-          <SummaryLabel>главных показателя</SummaryLabel>
-        </SummaryItem>
-        <SummaryItem>
-          <SummaryValue>1</SummaryValue>
-          <SummaryLabel>цель — не разориться</SummaryLabel>
-        </SummaryItem>
-      </Summary>
+      <Content>
+        <Header>
+          <Eyebrow>Перед открытием</Eyebrow>
+          <Title>Продержитесь шесть недель</Title>
+          <Lead>
+            Управляйте придорожной таверной, принимайте решения и не дайте
+            заведению разориться. Одна партия занимает 5–7 минут.
+          </Lead>
+        </Header>
 
-      <RulesSection aria-labelledby="week-rules-title">
-        <SectionTitle id="week-rules-title">Как проходит неделя</SectionTitle>
-        <StepList>
-          {WEEK_STEPS.map(step => (
-            <Step key={step.number}>
-              <StepNumber aria-hidden="true">{step.number}</StepNumber>
-              <StepText>
-                <StepTitle>{step.title}</StepTitle>
-                <StepDescription>{step.text}</StepDescription>
-              </StepText>
-            </Step>
-          ))}
-        </StepList>
-      </RulesSection>
+        <Summary aria-label="Цель игры">
+          <SummaryItem>
+            <SummaryValue>6</SummaryValue>
+            <SummaryLabel>игровых недель</SummaryLabel>
+          </SummaryItem>
+          <SummaryItem>
+            <SummaryValue>2</SummaryValue>
+            <SummaryLabel>главных показателя</SummaryLabel>
+          </SummaryItem>
+          <SummaryItem>
+            <SummaryValue>1</SummaryValue>
+            <SummaryLabel>цель — не разориться</SummaryLabel>
+          </SummaryItem>
+        </Summary>
 
-      <Indicators aria-labelledby="indicators-title">
-        <SectionTitle id="indicators-title">
-          Следите за показателями
-        </SectionTitle>
-        <IndicatorGrid>
-          <Indicator>
-            <IndicatorName $color="gold">Казна</IndicatorName>
-            <IndicatorText>
-              Оплачивает расходы и подготовку зала. Если золото уйдёт в минус,
-              партия закончится.
-            </IndicatorText>
-          </Indicator>
-          <Indicator>
-            <IndicatorName $color="reputation">Репутация</IndicatorName>
-            <IndicatorText>
-              Определяет поток гостей. Довольные посетители поднимают её, а
-              очереди и сломанные столы — снижают.
-            </IndicatorText>
-          </Indicator>
-        </IndicatorGrid>
-      </Indicators>
+        <RulesSection aria-labelledby="week-rules-title">
+          <SectionTitle id="week-rules-title">Как проходит неделя</SectionTitle>
+          <StepList>
+            {WEEK_STEPS.map(step => (
+              <Step key={step.number}>
+                <StepNumber aria-hidden="true">{step.number}</StepNumber>
+                <StepText>
+                  <StepTitle>{step.title}</StepTitle>
+                  <StepDescription>{step.text}</StepDescription>
+                </StepText>
+              </Step>
+            ))}
+          </StepList>
+        </RulesSection>
 
-      <Tip>
-        <TipLabel>Совет трактирщика</TipLabel>
-        <TipText>
-          Экономия сегодня может оставить таверну без гостей завтра. Иногда
-          вовремя починенный стол ценнее золота в сундуке.
-        </TipText>
-      </Tip>
+        <Indicators aria-labelledby="indicators-title">
+          <SectionTitle id="indicators-title">
+            Следите за показателями
+          </SectionTitle>
+          <IndicatorGrid>
+            <Indicator>
+              <IndicatorName $color="gold">Казна</IndicatorName>
+              <IndicatorText>
+                Оплачивает расходы и подготовку зала. Если золото уйдёт в минус,
+                партия закончится.
+              </IndicatorText>
+            </Indicator>
+            <Indicator>
+              <IndicatorName $color="reputation">Репутация</IndicatorName>
+              <IndicatorText>
+                Определяет поток гостей. Довольные посетители поднимают её, а
+                очереди и сломанные столы — снижают.
+              </IndicatorText>
+            </Indicator>
+          </IndicatorGrid>
+        </Indicators>
 
-      <Actions>
-        <StartLink to={ROUTES.game} $variant="primary">
-          Начать игру <span aria-hidden="true">→</span>
-        </StartLink>
-        <BackLink to={ROUTES.main} $variant="secondary">
-          Вернуться в меню
-        </BackLink>
-      </Actions>
-    </Content>
-  </Page>
-)
+        <Tip>
+          <TipLabel>Совет трактирщика</TipLabel>
+          <TipText>
+            Экономия сегодня может оставить таверну без гостей завтра. Иногда
+            вовремя починенный стол ценнее золота в сундуке.
+          </TipText>
+        </Tip>
+
+        <Actions>
+          <StartLink to={ROUTES.game} $variant="primary">
+            Начать игру <span aria-hidden="true">→</span>
+          </StartLink>
+          <BackLink to={ROUTES.main} $variant="secondary">
+            Вернуться в меню
+          </BackLink>
+        </Actions>
+      </Content>
+    </Page>
+  )
+}
 
 const Page = styled.main`
   min-height: 100%;

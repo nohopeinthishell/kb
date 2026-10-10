@@ -7,8 +7,13 @@ import { useNavigate } from 'react-router-dom'
 import { createTopic } from '../../modules/forum'
 import FormButton from '../../ui/FormButton'
 import BackLink from '../../ui/BackLink'
+import { usePage } from '../../hooks/usePage'
+import { initAuth } from '../../modules/auth'
+import type { PageInitArgs } from '../../routes'
 
 export const NewTopicPage = () => {
+  usePage({ initPage: initNewTopicPage })
+
   const [title, setTitle] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -83,4 +88,4 @@ const Form = styled.form`
   gap: 8px;
 `
 
-export const initNewTopicPage = async () => Promise.resolve()
+export const initNewTopicPage = async (args: PageInitArgs) => initAuth(args)

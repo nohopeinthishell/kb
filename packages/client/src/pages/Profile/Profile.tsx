@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { ApiError, logout, updateProfile } from '../../api'
+import { ApiError, getCourseApiUrl, logout, updateProfile } from '../../api'
 import { ROUTES } from '../../constants/routes'
 import { useFormValidation } from '../../hooks/useFormValidation'
 import { usePage } from '../../hooks/usePage'
@@ -171,7 +171,7 @@ export const ProfilePage = () => {
   const initials = `${user.first_name.charAt(0)}${user.second_name.charAt(0)}`
 
   const avatarUrl = user.avatar
-    ? `https://ya-praktikum.tech/api/v2/resources${user.avatar}`
+    ? getCourseApiUrl(`/resources${user.avatar}`, false)
     : null
 
   return (

@@ -7,6 +7,7 @@ services:
       dockerfile: d-client.Dockerfile
       args:
         CLIENT_PORT: ${CLIENT_PORT}
+        INTERNAL_SERVER_URL: http://server:${SERVER_PORT:-3001}
     restart: always
     ports:
       - "${CLIENT_PORT}:${CLIENT_PORT}"
@@ -37,6 +38,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SERVER_PORT: ${SERVER_PORT}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-true}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:3000}
     networks:
       - backend
       - frontend
@@ -66,5 +69,4 @@ networks:
     driver: bridge
   frontend:
     driver: bridge
-
 
