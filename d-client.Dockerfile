@@ -18,6 +18,7 @@ RUN yarn build --scope=client
 
 FROM node:$NODE_VERSION-bookworm-slim AS production
 ARG CLIENT_PORT
+ENV NODE_ENV=production
 WORKDIR /app
 
 # Зависимости ставятся строго по yarn.lock: без него yarn берёт свежие версии из диапазонов,
