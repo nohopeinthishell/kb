@@ -7,6 +7,8 @@ WORKDIR /app
 
 FROM base AS builder
 
+ARG INTERNAL_SERVER_URL=http://server:3001
+
 COPY package.json yarn.lock ./
 COPY packages/client/package.json packages/client/
 COPY packages/server/package.json packages/server/
@@ -14,7 +16,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN yarn build --scope=client
+RUN INTERNAL_SERVER_URL="$INTERNAL_SERVER_URL" yarn build --scope=client
 
 FROM node:$NODE_VERSION-bookworm-slim AS production
 ARG CLIENT_PORT
