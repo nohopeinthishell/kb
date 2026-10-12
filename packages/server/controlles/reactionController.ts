@@ -1,13 +1,8 @@
 import type { Request, Response } from 'express'
 import { ForeignKeyConstraintError, UniqueConstraintError } from 'sequelize'
 import type { AuthenticatedLocals } from '../middleware'
-import { Comment, Reaction, REACTION_TYPES } from '../models'
-import type { ReactionType } from '../models'
+import { Comment, Reaction, REACTION_TYPES, isReactionType } from '../models'
 import { isPlainObject } from '../utils'
-
-function isReactionType(value: unknown): value is ReactionType {
-  return REACTION_TYPES.some(type => type === value)
-}
 
 export const createReaction = async (
   req: Request,
