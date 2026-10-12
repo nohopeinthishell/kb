@@ -1,3 +1,6 @@
+import { Route, Routes } from 'react-router-dom'
+import type { ReactElement } from 'react'
+
 import { AppDispatch, RootState } from './store'
 
 import { initMainPage, MainPage } from './pages/Main'
@@ -11,7 +14,11 @@ import { initLeaderboardPage, LeaderboardPage } from './pages/Leaderboard'
 import { ForumPage, initForumPage } from './pages/Forum'
 import { TopicPage, initTopicPage } from './pages/Topic'
 import { NewTopicPage, initNewTopicPage } from './pages/NewTopic'
-import { ProtectedRoute, PublicOnlyRoute } from './modules/auth'
+import {
+  OAuthCallbackRoute,
+  ProtectedRoute,
+  PublicOnlyRoute,
+} from './modules/auth'
 import { initStartGamePage, StartGamePage } from './pages/StartGame'
 import { ServerError, initServerErrorPage } from './pages/ServerError'
 
@@ -26,13 +33,21 @@ export type PageInitArgs = {
   ctx: PageInitContext
 }
 
-export const routes = [
+type AppRoute = {
+  path: string
+  element: ReactElement
+  fetchData?: (args: PageInitArgs) => Promise<void>
+}
+
+export const routes: AppRoute[] = [
   {
     path: ROUTES.main,
     element: (
-      <ProtectedRoute>
-        <MainPage />
-      </ProtectedRoute>
+      <OAuthCallbackRoute>
+        <ProtectedRoute>
+          <MainPage />
+        </ProtectedRoute>
+      </OAuthCallbackRoute>
     ),
     fetchData: initMainPage,
   },
@@ -110,7 +125,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.root,
-    Component: (
+    element: (
       <ProtectedRoute>
         <ForumPage />
       </ProtectedRoute>
@@ -119,7 +134,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.topic,
-    Component: (
+    element: (
       <ProtectedRoute>
         <TopicPage />
       </ProtectedRoute>
@@ -128,7 +143,7 @@ export const routes = [
   },
   {
     path: ROUTES.forum.create,
-    Component: (
+    element: (
       <ProtectedRoute>
         <NewTopicPage />
       </ProtectedRoute>
@@ -136,3 +151,11 @@ export const routes = [
     fetchData: initNewTopicPage,
   },
 ]
+
+export const AppRoutes = () => (
+  <Routes>
+    {routes.map(({ path, element }) => (
+      <Route key={path} path={path} element={element} />
+    ))}
+  </Routes>
+)

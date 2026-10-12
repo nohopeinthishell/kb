@@ -1,17 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { HelmetProvider } from 'react-helmet-async'
 import { ThemeProvider } from 'styled-components'
-import { store } from './store'
+import { createStore } from './store'
 
-import { routes } from './routes'
+import { AppRoutes } from './routes'
 import { GlobalStyle, theme } from './theme'
 import './assets/css/index.css'
 import ErrorBoundary from './components/ErrorBoundary'
 
-const router = createBrowserRouter(routes)
+const store = createStore(window.APP_INITIAL_STATE)
+delete window.APP_INITIAL_STATE
 
 ReactDOM.hydrateRoot(
   document.getElementById('root') as HTMLElement,
@@ -20,7 +21,9 @@ ReactDOM.hydrateRoot(
       <GlobalStyle />
       <Provider store={store}>
         <ErrorBoundary>
-          <RouterProvider router={router} />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
         </ErrorBoundary>
       </Provider>
     </ThemeProvider>

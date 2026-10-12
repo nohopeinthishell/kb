@@ -9,6 +9,8 @@ type GameOverScreenProps = {
   money: number
   reputation: number
   onPlayAgain: () => void
+  submissionStatus?: 'saving' | 'saved' | 'error'
+  onRetrySave?: () => void
 }
 
 const GameOverScreen = ({
@@ -16,6 +18,8 @@ const GameOverScreen = ({
   money,
   reputation,
   onPlayAgain,
+  submissionStatus,
+  onRetrySave,
 }: GameOverScreenProps) => {
   const score = calculateScore(money, reputation)
   const isVictory = status === 'won'
@@ -49,6 +53,21 @@ const GameOverScreen = ({
             <StatValue>{score}</StatValue>
           </Stat>
         </Stats>
+
+        {isVictory && submissionStatus && (
+          <SaveStatus role={submissionStatus === 'error' ? 'alert' : 'status'}>
+            {submissionStatus === 'saving' && 'Сохраняем результат…'}
+            {submissionStatus === 'saved' && 'Результат сохранён в лидерборде.'}
+            {submissionStatus === 'error' && (
+              <>
+                Не удалось сохранить результат.{' '}
+                <RetryButton type="button" onClick={onRetrySave}>
+                  Повторить отправку
+                </RetryButton>
+              </>
+            )}
+          </SaveStatus>
+        )}
 
         <Actions>
           <PlayAgainButton type="button" onClick={onPlayAgain}>
@@ -154,6 +173,21 @@ const Actions = styled.nav`
   display: flex;
   flex-direction: column;
   gap: 12px;
+`
+
+const SaveStatus = styled.p`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.text.secondary};
+`
+
+const RetryButton = styled.button`
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.action.primary};
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 `
 
 const PlayAgainButton = styled.button`

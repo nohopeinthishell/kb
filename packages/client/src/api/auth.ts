@@ -1,4 +1,10 @@
-const API_BASE_URL = 'https://ya-praktikum.tech/api/v2'
+export function getCourseApiUrl(
+  path: string,
+  server = typeof window === 'undefined'
+) {
+  const backend = server ? __INTERNAL_SERVER_URL__ : __EXTERNAL_SERVER_URL__
+  return `${backend.replace(/\/$/, '')}/api/v2${path}`
+}
 
 export type SignInRequest = {
   login: string
@@ -41,7 +47,7 @@ export async function request<TResponse>(
   init?: RequestInit,
   cookie?: string
 ): Promise<TResponse> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(getCourseApiUrl(path), {
     ...init,
     credentials: 'include',
     headers: {

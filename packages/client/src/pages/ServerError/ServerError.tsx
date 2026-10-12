@@ -5,8 +5,11 @@ import LinkUI from '../../ui/LinkUI'
 import serverError from './img/server-error-500.png'
 import { PageInitArgs } from '../../routes'
 import { initAuth } from '../../modules/auth'
+import { usePage } from '../../hooks/usePage'
 
 export const ServerError = () => {
+  usePage({ initPage: initServerErrorPage })
+
   return (
     <Page>
       <Helmet>

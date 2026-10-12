@@ -1,6 +1,7 @@
 export {
   ApiError,
   getCurrentUser,
+  getCourseApiUrl,
   logout,
   signIn,
   signUp,
@@ -15,3 +16,16 @@ export {
   type ChangePasswordRequest,
   type UpdateProfileRequest,
 } from './profile'
+export {
+  createYandexAuthorizeUrl,
+  getYandexServiceId,
+  signInWithYandex,
+} from './oauth'
+
+export {
+  getLeaderboard,
+  addUserToLeaderboard,
+  type GetLeaderboardParams,
+  type AddUserToLeaderboardData,
+  type LeaderboardRecord,
+} from './leaderboard'

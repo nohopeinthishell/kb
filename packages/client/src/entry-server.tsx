@@ -4,39 +4,19 @@ import { Provider } from 'react-redux'
 import { ServerStyleSheet, ThemeProvider } from 'styled-components'
 import { HelmetProvider, HelmetServerState } from 'react-helmet-async'
 import { Request as ExpressRequest } from 'express'
-import {
-  createStaticHandler,
-  createStaticRouter,
-  StaticRouterProvider,
-} from 'react-router-dom/server'
+import { StaticRouter } from 'react-router-dom/server'
 import { matchRoutes } from 'react-router-dom'
-import { configureStore } from '@reduxjs/toolkit'
 
-import {
-  createContext,
-  createFetchRequest,
-  createUrl,
-} from './entry-server.utils'
-import { reducer } from './store'
-import { routes } from './routes'
+import { createContext, createUrl } from './entry-server.utils'
+import { createStore } from './store'
+import { AppRoutes, routes } from './routes'
 import { GlobalStyle, theme } from './theme'
 import './assets/css/index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
 import ErrorBoundary from './components/ErrorBoundary'
 
 export const render = async (req: ExpressRequest) => {
-  const { query, dataRoutes } = createStaticHandler(routes)
-  const fetchRequest = createFetchRequest(req)
-  const context = await query(fetchRequest)
-
-  if (context instanceof Response) {
-    throw context
-  }
-
-  const store = configureStore({
-    reducer,
-  })
-
+  const store = createStore()
   const url = createUrl(req)
 
   const foundRoutes = matchRoutes(routes, url)
@@ -44,11 +24,9 @@ export const render = async (req: ExpressRequest) => {
     throw new Error('Страница не найдена!')
   }
 
-  const [
-    {
-      route: { fetchData },
-    },
-  ] = foundRoutes
+  const matchedRoute = foundRoutes[foundRoutes.length - 1].route
+  const statusCode = matchedRoute.path === '*' ? 404 : 200
+  const fetchData = matchedRoute.fetchData
 
   try {
     if (fetchData) {
@@ -64,7 +42,6 @@ export const render = async (req: ExpressRequest) => {
 
   store.dispatch(setPageHasBeenInitializedOnServer(true))
 
-  const router = createStaticRouter(dataRoutes, context)
   const sheet = new ServerStyleSheet()
   const helmetContext: { helmet?: HelmetServerState } = {}
   try {
@@ -75,7 +52,9 @@ export const render = async (req: ExpressRequest) => {
             <GlobalStyle />
             <Provider store={store}>
               <ErrorBoundary>
-                <StaticRouterProvider router={router} context={context} />
+                <StaticRouter location={`${url.pathname}${url.search}`}>
+                  <AppRoutes />
+                </StaticRouter>
               </ErrorBoundary>
             </Provider>
           </ThemeProvider>
@@ -86,6 +65,7 @@ export const render = async (req: ExpressRequest) => {
 
     return {
       html,
+      statusCode,
       helmet: helmetContext.helmet as HelmetServerState,
       styleTags,
       initialState: store.getState(),

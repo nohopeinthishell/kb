@@ -7,8 +7,11 @@ import notFoundDoor from './img/not-found-404.png'
 
 import LinkUI from '../../ui/LinkUI'
 import { initAuth } from '../../modules/auth'
+import { usePage } from '../../hooks/usePage'
 
 export const NotFoundPage = () => {
+  usePage({ initPage: initNotFoundPage })
+
   return (
     <Page>
       <Helmet>

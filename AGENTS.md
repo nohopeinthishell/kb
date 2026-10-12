@@ -29,7 +29,7 @@ yarn lerna add {dep} --dev --scope server   # dev-зависимость сер�
 ```
 
 Продакшен-окружение локально: `node init.js`, затем `docker compose up`
-(nginx + node + postgres). Отдельный сервис — `docker compose up server`.
+(client — node с SSR, server — node API, postgres). Отдельный сервис — `docker compose up server`.
 
 Git-хуки на lefthook. Пропуск проверок через `--no-verify` — только в крайнем случае.
 

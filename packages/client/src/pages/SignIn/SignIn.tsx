@@ -1,6 +1,6 @@
 import type { PageInitArgs } from '../../routes'
 
-import { FormEvent, useEffect } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import styled from 'styled-components'
@@ -10,8 +10,11 @@ import FormField from '../../ui/FormField'
 import FormLink from '../../ui/FormLink'
 import FormUI, { FormError } from '../../ui/FormUI'
 
-import { ROUTES } from '../../constants/routes'
-import { initAuth } from '../../modules/auth'
+import { createYandexAuthorizeUrl, getYandexServiceId } from '../../api'
+import { getOAuthRedirectUri, ROUTES } from '../../constants/routes'
+import { useFormValidation } from '../../hooks/useFormValidation'
+import { usePage } from '../../hooks/usePage'
+import { createOAuthState, initAuth } from '../../modules/auth'
 import {
   clearUserError,
   login,
@@ -20,13 +23,25 @@ import {
 } from '../../slices/userSlice'
 
 import { useDispatch, useSelector } from '../../store'
+import { validationRules } from '../../utils/validation'
+
+const signInValidators = {
+  login: validationRules.login,
+  password: validationRules.password,
+}
 
 export const SignInPage = () => {
+  usePage({ initPage: initSignInPage })
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const isLoading = useSelector(selectAuthLoading)
   const error = useSelector(selectUserError)
+  const [isOAuthLoading, setIsOAuthLoading] = useState(false)
+  const [oauthError, setOAuthError] = useState<string | null>(null)
+  const { getFieldValidationProps, validateForm } =
+    useFormValidation(signInValidators)
 
   useEffect(() => {
     dispatch(clearUserError())
@@ -34,21 +49,48 @@ export const SignInPage = () => {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setOAuthError(null)
 
     const data = new FormData(event.currentTarget)
+    const values = {
+      login: String(data.get('login') ?? ''),
+      password: String(data.get('password') ?? ''),
+    }
+
+    if (!validateForm(values)) return
 
     try {
-      await dispatch(
-        login({
-          login: String(data.get('login') ?? ''),
-          password: String(data.get('password') ?? ''),
-        })
-      ).unwrap()
+      await dispatch(login(values)).unwrap()
 
       navigate(ROUTES.main, { replace: true })
     } catch (error: unknown) {
       // Ошибка отобразится в Redux слое
       console.error(error)
+    }
+  }
+
+  async function handleYandexSignIn() {
+    dispatch(clearUserError())
+    setIsOAuthLoading(true)
+    setOAuthError(null)
+
+    try {
+      const redirectUri = getOAuthRedirectUri(window.location.origin)
+      const { service_id: serviceId } = await getYandexServiceId(redirectUri)
+
+      const state = createOAuthState()
+      window.location.href = createYandexAuthorizeUrl(
+        serviceId,
+        redirectUri,
+        state
+      )
+    } catch (requestError) {
+      setOAuthError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Не удалось начать вход через Яндекс'
+      )
+      setIsOAuthLoading(false)
     }
   }
 
@@ -68,6 +110,7 @@ export const SignInPage = () => {
             type="text"
             placeholder="Введите логин"
             autoComplete="username"
+            {...getFieldValidationProps('login')}
           />
           <FormField
             label="Пароль"
@@ -75,12 +118,22 @@ export const SignInPage = () => {
             type="password"
             placeholder="Введите пароль"
             autoComplete="current-password"
+            {...getFieldValidationProps('password')}
           />
         </Fields>
-        {error && <FormError role="alert">{error}</FormError>}
-        <FormButton type="submit" disabled={isLoading}>
+        {(error || oauthError) && (
+          <FormError role="alert">{error || oauthError}</FormError>
+        )}
+        <FormButton type="submit" disabled={isLoading || isOAuthLoading}>
           {isLoading ? 'Входим…' : 'Войти'}
         </FormButton>
+        <Separator>или</Separator>
+        <OAuthButton
+          type="button"
+          disabled={isLoading || isOAuthLoading}
+          onClick={handleYandexSignIn}>
+          {isOAuthLoading ? 'Переходим в Яндекс…' : 'Войти через Яндекс'}
+        </OAuthButton>
         <Footer>
           <FooterText>Ещё нет аккаунта?</FooterText>
           <FormLink to={ROUTES.signUp}>Зарегистрироваться</FormLink>
@@ -121,4 +174,36 @@ const FooterText = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
   font: inherit;
   font-size: 16px;
+`
+
+const Separator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: ${({ theme }) => theme.colors.text.muted};
+  font-size: 14px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: ${({ theme }) => theme.colors.border.subtle};
+  }
+`
+
+const OAuthButton = styled(FormButton)`
+  color: ${({ theme }) => theme.colors.action.secondaryText};
+  background: ${({ theme }) => theme.colors.action.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: ${({ theme }) => theme.colors.action.secondaryHover};
+    }
+  }
+
+  &:active:not(:disabled) {
+    background: ${({ theme }) => theme.colors.action.secondaryActive};
+  }
 `

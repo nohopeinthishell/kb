@@ -1,0 +1,39 @@
+ARG NODE_VERSION=22
+ARG CLIENT_PORT=3000
+
+FROM node:$NODE_VERSION-bookworm AS base
+
+WORKDIR /app
+
+FROM base AS builder
+
+ARG INTERNAL_SERVER_URL=http://server:3001
+
+COPY package.json yarn.lock ./
+COPY packages/client/package.json packages/client/
+COPY packages/server/package.json packages/server/
+RUN yarn install --frozen-lockfile
+
+COPY . .
+
+RUN INTERNAL_SERVER_URL="$INTERNAL_SERVER_URL" yarn build --scope=client
+
+FROM node:$NODE_VERSION-bookworm-slim AS production
+ARG CLIENT_PORT
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Зависимости ставятся строго по yarn.lock: без него yarn берёт свежие версии из диапазонов,
+# и в проде оказываются не те версии, с которыми собран бандл.
+# Манифест server не копируется намеренно: ставим зависимости только клиента (Yarn 1 это допускает).
+COPY --from=builder /app/package.json package.json
+COPY --from=builder /app/yarn.lock yarn.lock
+
+COPY --from=builder /app/packages/client/package.json packages/client/package.json
+RUN yarn install --frozen-lockfile --production=true
+
+COPY --from=builder /app/packages/client/dist/ packages/client/dist/
+COPY --from=builder /app/packages/client/server/ packages/client/server/
+
+EXPOSE $CLIENT_PORT
+CMD [ "node", "/app/packages/client/server/index.js" ]

@@ -1,11 +1,16 @@
 import styled from 'styled-components'
 import { Helmet } from 'react-helmet-async'
 import { getTopics, TopicList } from '../../modules/forum'
+import { initAuth } from '../../modules/auth'
 import LinkUI from '../../ui/LinkUI'
 import { ROUTES } from '../../constants/routes'
 import BackLink from '../../ui/BackLink'
+import { usePage } from '../../hooks/usePage'
+import type { PageInitArgs } from '../../routes'
 
 export const ForumPage = () => {
+  usePage({ initPage: initForumPage })
+
   const topics = getTopics()
 
   return (
@@ -41,4 +46,4 @@ const Title = styled.h1`
   text-align: center;
 `
 
-export const initForumPage = async () => Promise.resolve()
+export const initForumPage = async (args: PageInitArgs) => initAuth(args)

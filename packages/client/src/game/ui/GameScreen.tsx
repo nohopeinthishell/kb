@@ -1,13 +1,24 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { applyAction, createNewGameState, GameAction, tick } from '../core'
+import {
+  applyAction,
+  calculateScore,
+  createNewGameState,
+  GameAction,
+  tick,
+} from '../core'
 import { EVENTS } from '../core/events'
 import EventCard from './EventCard'
 import GameOverScreen from './GameOverScreen'
 import TavernCanvas from './TavernCanvas'
+import { addUserToLeaderboard, type AddUserToLeaderboardData } from '../../api'
+import { useSelector } from '../../store'
+import { selectUser } from '../../slices/userSlice'
+import { useFullscreen } from '../../hooks/useFullscreen'
 
 const GameScreen = () => {
+  const user = useSelector(selectUser)
   const [state, setState] = useState(createNewGameState)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isFullscreenAvailable, setIsFullscreenAvailable] = useState(false)
@@ -25,13 +36,47 @@ const GameScreen = () => {
     return () =>
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
   }, [])
+  const [submission, setSubmission] = useState<{
+    data: AddUserToLeaderboardData
+    status: 'saving' | 'saved' | 'error'
+  } | null>(null)
+  const gameId = useRef(0)
+  const pageRef = useRef<HTMLElement>(null)
+  const { isSupported, isFullscreen, toggle } = useFullscreen(pageRef)
+
+  const saveResult = async (data: AddUserToLeaderboardData) => {
+    const currentGameId = gameId.current
+    setSubmission({ data, status: 'saving' })
+    try {
+      await addUserToLeaderboard(data)
+      if (gameId.current === currentGameId) {
+        setSubmission({ data, status: 'saved' })
+      }
+    } catch {
+      if (gameId.current === currentGameId) {
+        setSubmission({ data, status: 'error' })
+      }
+    }
+  }
 
   const handlePlayAgain = () => {
+    gameId.current += 1
+    setSubmission(null)
     setState(createNewGameState())
   }
 
   const handleNextWeek = () => {
-    setState(currentState => tick(currentState))
+    const nextState = tick(state)
+    setState(nextState)
+
+    if (state.status === 'playing' && nextState.status === 'won' && user) {
+      const score = calculateScore(nextState.money, nextState.reputation)
+      void saveResult({
+        userId: user.id,
+        name: user.display_name ?? user.login,
+        score,
+      })
+    }
   }
 
   const handleApplyAction = (type: GameAction) => {
@@ -83,6 +128,14 @@ const GameScreen = () => {
             {isFullscreen ? 'Выйти из полноэкранного режима' : 'На весь экран'}
           </FullscreenButton>
         )}
+        {isSupported && (
+          <FullscreenButton
+            type="button"
+            onClick={toggle}
+            aria-pressed={isFullscreen}>
+            {isFullscreen ? 'Выйти' : 'На весь экран'}
+          </FullscreenButton>
+        )}
       </StatusBar>
 
       <CanvasFrame>
@@ -129,12 +182,18 @@ const GameScreen = () => {
         </NextWeekButton>
       </Controls>
 
-      {isGameFinished && (
+      {(state.status === 'won' || state.status === 'lost') && (
         <GameOverScreen
           status={state.status}
           money={state.money}
           reputation={state.reputation}
           onPlayAgain={handlePlayAgain}
+          submissionStatus={submission?.status}
+          onRetrySave={
+            submission?.status === 'error'
+              ? () => void saveResult(submission.data)
+              : undefined
+          }
         />
       )}
     </Page>
@@ -144,7 +203,6 @@ const GameScreen = () => {
 const Page = styled.main`
   box-sizing: border-box;
   width: min(100%, 1048px);
-  height: 100vh;
   height: 100dvh;
   margin: 0 auto;
   padding: clamp(8px, 2.5vh, 24px);
@@ -158,11 +216,17 @@ const Page = styled.main`
     width: 100%;
     max-width: none;
   }
+
+  /* Без своего фона за полноэкранным элементом виден чёрный ::backdrop */
+  &:fullscreen {
+    background: ${({ theme }) => theme.colors.background.page};
+  }
 `
 
 const StatusBar = styled.div`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 16px;
@@ -233,6 +297,23 @@ const ActionButton = styled.button`
 
 const NextWeekButton = styled(ActionButton)`
   margin-left: auto;
+`
+
+const FullscreenButton = styled.button`
+  padding: 6px 12px;
+  color: ${({ theme }) => theme.colors.action.secondaryText};
+  background: ${({ theme }) => theme.colors.action.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.action.secondaryHover};
+  }
+
+  &:active {
+    background: ${({ theme }) => theme.colors.action.secondaryActive};
+  }
 `
 
 export default GameScreen

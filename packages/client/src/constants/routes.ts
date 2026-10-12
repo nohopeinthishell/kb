@@ -16,6 +16,8 @@ export const ROUTES = {
   serverError: '/500',
 } as const
 
+export const getOAuthRedirectUri = (origin: string) => origin
+
 export const topicPath = (topicId: number) => {
   return generatePath(ROUTES.forum.topic, { topicId: String(topicId) })
 }

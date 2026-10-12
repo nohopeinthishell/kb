@@ -1,28 +1,30 @@
-import { Client } from 'pg'
+import { Comment, Reaction, Topic } from './models'
+import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 
-const { POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_PORT } =
-  process.env
+const {
+  POSTGRES_USER,
+  POSTGRES_PASSWORD,
+  POSTGRES_DB,
+  POSTGRES_PORT,
+  POSTGRES_HOST,
+} = process.env
 
-export const createClientAndConnect = async (): Promise<Client | null> => {
-  try {
-    const client = new Client({
-      user: POSTGRES_USER,
-      host: 'localhost',
-      database: POSTGRES_DB,
-      password: POSTGRES_PASSWORD,
-      port: Number(POSTGRES_PORT),
-    })
+const sequelizeOptions: SequelizeOptions = {
+  host: POSTGRES_HOST || 'localhost',
+  port: Number(POSTGRES_PORT),
+  username: POSTGRES_USER,
+  password: POSTGRES_PASSWORD,
+  database: POSTGRES_DB,
+  dialect: 'postgres',
+  models: [Topic, Comment, Reaction],
+}
 
-    await client.connect()
+export const sequelize = new Sequelize(sequelizeOptions)
 
-    const res = await client.query('SELECT NOW()')
-    console.log('  ➜ 🎸 Connected to the database at:', res?.rows?.[0].now)
-    client.end()
+export const createClientAndConnect = async (): Promise<void> => {
+  await sequelize.authenticate()
+  console.log('Successful connection')
 
-    return client
-  } catch (e) {
-    console.error(e)
-  }
-
-  return null
+  await sequelize.sync()
+  console.log('Tables prepared')
 }

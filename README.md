@@ -29,6 +29,7 @@ React + TypeScript, игровой зал отрисовывается чере�
 |---|---|
 | [docs/game-plan.md](docs/game-plan.md) | Что за игра, что видит игрок, как проходит партия |
 | [docs/architecture.md](docs/architecture.md) | Слои, границы модулей, ограничения SSR |
+| [docs/forum-api.md](docs/forum-api.md) | API форума: маршруты, авторизация, комментарии, ответы и реакции |
 | [docs/contributing.md](docs/contributing.md) | Правила разработки, git, ревью и спринта |
 | [AGENTS.md](AGENTS.md) | Инструкции для AI-помощников |
 
@@ -107,6 +108,12 @@ docs/               # документация проекта
 
 ### Production build
 
+Host builds use `INTERNAL_SERVER_URL=http://localhost:3001` from `.env.sample`,
+so SSR can reach the backend when running `yarn preview --scope client` locally.
+Docker Compose explicitly passes `http://server:${SERVER_PORT}` as a client build
+argument; standalone Docker builds default to `http://server:3001`. This override
+applies during compilation because Vite embeds the SSR backend URL in the bundle.
+
 ```yarn build```
 
 И чтобы посмотреть что получилось
@@ -137,7 +144,7 @@ docs/               # документация проекта
 
 
 `docker compose up` - запустит три сервиса
-1. node, отдающий клиент с серверным рендером (client) — см. `Dockerfile.client`
+1. node, отдающий клиент с серверным рендером (client) — см. `d-client.Dockerfile`
 2. node, ваш сервер (server)
 3. postgres, вашу базу данных (postgres)
 
