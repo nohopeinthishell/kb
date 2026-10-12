@@ -24,6 +24,8 @@
     "paths": {
       "*": ["types/*"]
     },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "outDir": "dist"
   },
   "exclude": ["dist", "node_modules"]
