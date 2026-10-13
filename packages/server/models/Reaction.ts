@@ -9,11 +9,10 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript'
-import { Comment } from './Comment'
 import type { Optional } from 'sequelize'
-
-export const REACTION_TYPES = ['like', 'heart', 'laugh'] as const
-export type ReactionType = typeof REACTION_TYPES[number]
+import { Comment } from './Comment'
+import { REACTION_TYPES } from './reactionTypes'
+import type { ReactionType } from './reactionTypes'
 
 type ReactionAttributes = {
   id: number
@@ -54,6 +53,6 @@ export class Reaction extends Model<
   @Column(DataType.INTEGER)
   declare commentId: number
 
-  @BelongsTo(() => Comment)
+  @BelongsTo(() => Comment, { onDelete: 'CASCADE' })
   declare comment: Comment
 }

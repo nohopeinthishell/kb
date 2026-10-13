@@ -1,5 +1,6 @@
 import { Comment, Reaction, Topic } from './models'
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
+import { runMigrations } from './migrations'
 
 const {
   POSTGRES_USER,
@@ -27,4 +28,7 @@ export const createClientAndConnect = async (): Promise<void> => {
 
   await sequelize.sync()
   console.log('Tables prepared')
+
+  await runMigrations(sequelize)
+  console.log('Migrations applied')
 }
