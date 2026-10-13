@@ -7,9 +7,45 @@ React + TypeScript, игровой зал отрисовывается чере�
 
 > **Демо:** _ссылка появится после первого деплоя_
 >
-> **Видео с демонстрацией задач 5 и 6 спринтов:** https://disk.yandex.ru/i/cd5H_1SjA8fdXg
-> 
+> **🎬 Видео с демонстрацией задач 7 и 8 спринтов:** https://drive.google.com/file/d/1eCJdXpFv5G_5UOGgsm7RLatYcGmPotOo/view?usp=sharing
+
 ![Зал таверны](docs/assets/game-screen-dark.png)
+
+## Запуск проекта
+
+Нужны Node.js `>= 22.12.0`, Yarn и Docker.
+
+### Вариант 1: всё в Docker (как в проде)
+
+```bash
+node init.js            # создаёт .env из .env.sample и папку tmp/pgdata для базы
+docker compose up --build
+```
+
+Поднимутся три сервиса: клиент с SSR, свой бэкенд и PostgreSQL.
+
+- Клиент: http://localhost:3000
+- Сервер: http://localhost:3001
+
+### Вариант 2: локальная разработка
+
+```bash
+yarn bootstrap                 # обязательный шаг: зависимости + .env
+docker compose up -d postgres  # серверу нужна база
+yarn dev                       # клиент и сервер вместе, с hot reload
+```
+
+Запустить только одну часть: `yarn dev --scope=client` или `yarn dev --scope=server`.
+
+### Вариант 3: production-сборка без Docker
+
+```bash
+yarn build
+yarn preview --scope server
+yarn preview --scope client
+```
+
+Порты и доступы к базе настраиваются в `.env` (шаблон — `.env.sample`).
 
 ## Что это за игра
 
@@ -66,14 +102,7 @@ docs/               # документация проекта
 Перед первым PR прочитайте [docs/architecture.md](docs/architecture.md) —
 там границы слоёв и ограничения SSR, которые проверяются на ревью.
 
-### Как запускать?
-
-1. Убедитесь что у вас установлен `node` и `docker`
-2. Выполните команду `yarn bootstrap` - это обязательный шаг, без него ничего работать не будет :)
-3. Выполните команду `yarn dev`
-4. Выполните команду `yarn dev --scope=client` чтобы запустить только клиент
-5. Выполните команду `yarn dev --scope=server` чтобы запустить только server
-
+Как запустить проект — в разделе [«Запуск проекта»](#запуск-проекта).
 
 ### Как добавить зависимости?
 В этом проекте используется `monorepo` на основе [`lerna`](https://github.com/lerna/lerna)
